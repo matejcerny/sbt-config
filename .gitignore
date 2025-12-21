@@ -1,5 +1,59 @@
-*.class
+# Bloop
+.bloop/
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+# IntelliJ Idea
+*.iml
+*.ipr
+*.iws
+.idea/
+# Logfiles and rotated logfiles.
 *.log
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+*.log.[0-9]*
+# MacOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+# Metals
+.metals/
+metals.sbt
+# SBT
+.bsp/
+target/
+lib_managed/
+src_managed/
+project/boot/
+.history
+.cache
+# Vim
+.*.sw[a-z]
+*.un~
+Session.vim
+/tags
+# Visual Studio Code
+.vscode/
+.history/
+# Windows
+Thumbs.db
+Desktop.ini
+app.version

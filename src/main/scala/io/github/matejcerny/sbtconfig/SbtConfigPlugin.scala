@@ -2,7 +2,7 @@ package io.github.matejcerny.sbtconfig
 
 import sbt._
 import sbt.Keys._
-import java.io.{File, PrintWriter}
+import java.io.{ File, PrintWriter }
 import scala.util.Try
 
 object SbtConfigPlugin extends AutoPlugin {
@@ -34,28 +34,26 @@ object SbtConfigPlugin extends AutoPlugin {
   )
 
   private def configValue[A](
-    fileKey: SettingKey[File],
-    extract: ProjectConfig => Option[A]
+      fileKey: SettingKey[File],
+      extract: ProjectConfig => Option[A]
   ): Def.Initialize[Option[A]] = Def.setting {
     val file = fileKey.value
     ensureConfigFileExists(file)
     loadConfig(file).flatMap(extract)
   }
 
-  private def loadConfig(file: File): Option[ProjectConfig] = {
+  private def loadConfig(file: File): Option[ProjectConfig] =
     ConfigParser.parse(file) match {
       case Right(config) => Some(config)
       case Left(error) =>
         System.err.println(s"[sbt-config] $error")
         None
     }
-  }
 
-  private def ensureConfigFileExists(file: File): Unit = {
+  private def ensureConfigFileExists(file: File): Unit =
     if (!file.exists()) {
       createDefaultConfigFile(file)
     }
-  }
 
   private def createDefaultConfigFile(file: File): Unit = {
     val content =
@@ -92,11 +90,10 @@ object SbtConfigPlugin extends AutoPlugin {
     }
   }
 
-  private def toModuleId(dep: Dependency): ModuleID = {
+  private def toModuleId(dep: Dependency): ModuleID =
     if (dep.crossVersion) {
       dep.organization %% dep.name % dep.version
     } else {
       dep.organization % dep.name % dep.version
     }
-  }
 }

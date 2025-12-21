@@ -9,7 +9,8 @@ lazy val root = (project in file("."))
     description := "Configure sbt projects via HOCON configuration files",
     sbtPlugin := true,
     libraryDependencies ++= Seq(
-      "com.typesafe" % "config" % "1.4.3"
+      "com.typesafe" % "config" % "1.4.3",
+      "org.scalatest" %% "scalatest" % "3.2.19" % Test
     ),
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++

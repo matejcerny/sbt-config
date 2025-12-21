@@ -20,6 +20,9 @@ jobs:
           distribution: 'temurin'
           cache: 'sbt'
 
+      - name: Set up sbt
+        uses: sbt/setup-sbt@v1
+
       - name: Run unit tests
         run: sbt test
 
@@ -38,6 +41,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'sbt'
+
+      - name: Set up sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Check formatting
         run: sbt scalafmtCheckAll

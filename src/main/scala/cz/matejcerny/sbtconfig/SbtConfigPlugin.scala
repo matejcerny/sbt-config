@@ -73,10 +73,14 @@ object SbtConfigPlugin extends AutoPlugin {
          |#   "-unchecked"
          |# ]
          |
+         |# Dependencies (format: "organization:artifact:version")
+         |# Equivalent to: libraryDependencies += "org.typelevel" %% "cats-core" % "2.13.0"
          |# dependencies = [
          |#   "org.typelevel:cats-core:2.13.0"
          |# ]
          |
+         |# Test dependencies (automatically added with Test scope)
+         |# Equivalent to: libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test
          |# testDependencies = [
          |#   "org.scalatest:scalatest:3.2.19"
          |# ]

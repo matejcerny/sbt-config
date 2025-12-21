@@ -1,0 +1,10 @@
+# Run assertions - these fail if values don't match build.conf
+> checkName
+> checkOrganization
+> checkVersion
+> checkScalaVersion
+> checkScalacOptions
+> checkDependencies
+
+# Verify project compiles (dependencies resolve correctly)
+> compile

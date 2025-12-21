@@ -1,4 +1,4 @@
-package cz.matejcerny.sbtconfig
+package io.github.matejcerny.sbtconfig
 
 import com.typesafe.config.{ Config, ConfigFactory }
 import java.io.File

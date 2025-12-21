@@ -1,4 +1,4 @@
-package cz.matejcerny.sbtconfig
+package io.github.matejcerny.sbtconfig
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

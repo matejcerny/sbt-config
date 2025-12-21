@@ -1,4 +1,4 @@
-package cz.matejcerny.sbtconfig
+package io.github.matejcerny.sbtconfig
 
 /** Represents a single dependency.
   *

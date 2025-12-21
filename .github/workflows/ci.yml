@@ -23,8 +23,14 @@ jobs:
       - name: Set up sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Run unit tests
-        run: sbt test
+      - name: Run unit tests with coverage
+        run: sbt coverage test coverageReport
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: target/scala-2.12/scoverage-report/scoverage.xml
 
       - name: Run scripted tests
         run: sbt scripted

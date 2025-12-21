@@ -33,13 +33,17 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     projectConfig.version shouldBe Some("1.0.0")
     projectConfig.scalaVersion shouldBe Some("3.3.4")
     projectConfig.scalacOptions shouldBe Some(Seq("-deprecation", "-feature"))
-    projectConfig.dependencies shouldBe Some(Seq(
-      Dependency("org.typelevel", "cats-core", "2.13.0"),
-      Dependency("io.circe", "circe-core", "0.14.10")
-    ))
-    projectConfig.testDependencies shouldBe Some(Seq(
-      Dependency("org.scalatest", "scalatest", "3.2.19")
-    ))
+    projectConfig.dependencies shouldBe Some(
+      Seq(
+        Dependency("org.typelevel", "cats-core", "2.13.0"),
+        Dependency("io.circe", "circe-core", "0.14.10")
+      )
+    )
+    projectConfig.testDependencies shouldBe Some(
+      Seq(
+        Dependency("org.scalatest", "scalatest", "3.2.19")
+      )
+    )
   }
 
   it should "parse a minimal config with only some fields" in {
@@ -106,7 +110,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     result.left.value should include("Invalid dependency format")
   }
 
-  it should "collect all dependency parsing errors" in {
+  it should "collect all dependency parsing errors within a field" in {
     val config =
       """
         |dependencies = ["invalid1", "invalid2"]
@@ -119,6 +123,22 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     result.left.value should include("invalid2")
   }
 
+  it should "collect errors from both dependencies and testDependencies" in {
+    val config =
+      """
+        |dependencies = ["invalid-dep"]
+        |testDependencies = ["invalid-test-dep"]
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isLeft shouldBe true
+    result.left.value should include("dependencies")
+    result.left.value should include("invalid-dep")
+    result.left.value should include("testDependencies")
+    result.left.value should include("invalid-test-dep")
+  }
+
   it should "trim whitespace from dependency parts" in {
     val config =
       """
@@ -128,12 +148,15 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    result.value.dependencies shouldBe Some(Seq(
-      Dependency("org.typelevel", "cats-core", "2.13.0")
-    ))
+    result.value.dependencies shouldBe Some(
+      Seq(
+        Dependency("org.typelevel", "cats-core", "2.13.0")
+      )
+    )
   }
 
   it should "handle HOCON substitutions" in {
+    @scala.annotation.nowarn("msg=possible missing interpolator")
     val config =
       """
         |base-version = "1.0"

@@ -13,7 +13,8 @@ ThisBuild / developers := List(
   )
 )
 
-lazy val root = (project in file("."))
+lazy val root = project
+  .in(file("."))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-config",
@@ -41,9 +42,12 @@ lazy val root = (project in file("."))
     )
   )
 
-lazy val docs = (project in file("sbt-config-docs"))
+lazy val docs = project
+  .in(file("sbt-config-docs"))
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
   .settings(
+    moduleName := "sbt-config-docs",
     mdocVariables := Map("VERSION" -> version.value),
     publish / skip := true
   )
+  .dependsOn(root)

@@ -174,6 +174,8 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
 
   it should "parse config matching Example values" in {
     def depToString(d: Dependency): String = s""""${d.organization}:${d.name}:${d.version}""""
+    def devToString(d: Developer): String =
+      s"""{ id = "${d.id}", name = "${d.name}", email = "${d.email}", url = "${d.url}" }"""
     val config =
       s"""
         |name = "${Example.name}"
@@ -183,6 +185,10 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
         |scalacOptions = ${Example.scalacOptions.map(s => s""""$s"""").mkString("[", ", ", "]")}
         |dependencies = ${Example.dependencies.map(depToString).mkString("[", ", ", "]")}
         |testDependencies = ${Example.testDependencies.map(depToString).mkString("[", ", ", "]")}
+        |homepage = "${Example.homepage}"
+        |licenses = ${Example.licenses.map(s => s""""$s"""").mkString("[", ", ", "]")}
+        |versionScheme = "${Example.versionScheme}"
+        |developers = ${Example.developers.map(devToString).mkString("[", ", ", "]")}
         |""".stripMargin
 
     val result = ConfigParser.parse(config)
@@ -196,6 +202,93 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     projectConfig.scalacOptions shouldBe Some(Example.scalacOptions)
     projectConfig.dependencies shouldBe Some(Example.dependencies)
     projectConfig.testDependencies shouldBe Some(Example.testDependencies)
+    projectConfig.homepage shouldBe Some(Example.homepage)
+    projectConfig.licenses shouldBe Some(Example.licenses)
+    projectConfig.versionScheme shouldBe Some(Example.versionScheme)
+    projectConfig.developers shouldBe Some(Example.developers)
+  }
+
+  it should "parse publishing settings" in {
+    val config =
+      """
+        |homepage = "https://github.com/example/project"
+        |licenses = ["MIT", "Apache2"]
+        |versionScheme = "early-semver"
+        |developers = [
+        |  { id = "dev1", name = "Developer One", email = "dev1@example.com", url = "https://dev1.example.com" },
+        |  { id = "dev2", name = "Developer Two", email = "dev2@example.com", url = "https://dev2.example.com" }
+        |]
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isRight shouldBe true
+    val projectConfig = result.value
+    projectConfig.homepage shouldBe Some("https://github.com/example/project")
+    projectConfig.licenses shouldBe Some(Seq("MIT", "Apache2"))
+    projectConfig.versionScheme shouldBe Some("early-semver")
+    projectConfig.developers shouldBe Some(
+      Seq(
+        Developer("dev1", "Developer One", "dev1@example.com", "https://dev1.example.com"),
+        Developer("dev2", "Developer Two", "dev2@example.com", "https://dev2.example.com")
+      )
+    )
+  }
+
+  it should "return error for invalid developer format with all missing fields" in {
+    val config =
+      """
+        |developers = [
+        |  { id = "dev1", name = "Developer One" }
+        |]
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isLeft shouldBe true
+    result.left.value should include("Failed to parse developers")
+    result.left.value should include("email")
+    result.left.value should include("url")
+  }
+
+  it should "collect errors from multiple invalid developers" in {
+    val config =
+      """
+        |developers = [
+        |  { id = "dev1" },
+        |  { name = "Developer Two" }
+        |]
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isLeft shouldBe true
+    result.left.value should include("developer[0]")
+    result.left.value should include("developer[1]")
+    result.left.value should include("name")
+    result.left.value should include("email")
+    result.left.value should include("url")
+    result.left.value should include("id")
+  }
+
+  it should "return error when developers is not a list of objects" in {
+    val config =
+      """
+        |developers = "not a list"
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isLeft shouldBe true
+    result.left.value should include("Failed to parse developers")
+  }
+
+  "License.supported" should "contain sbt-supported licenses" in {
+    License.supported should contain("MIT")
+    License.supported should contain("Apache2")
+    License.supported should contain("GPL3")
+    License.supported should contain("CC0")
+    License.supported should have size 4
   }
 
   "ConfigParser.parse(File)" should "parse a valid config file" in {

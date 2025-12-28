@@ -1,6 +1,6 @@
 package io.github.matejcerny.sbtconfig
 
-import sbt._
+import sbt.{ Developer => _, License => _, _ }
 import sbt.Keys._
 import java.io.{ File, PrintWriter }
 import scala.util.Try
@@ -30,7 +30,16 @@ object SbtConfigPlugin extends AutoPlugin {
       .map(toModuleId),
     libraryDependencies ++= configValue(sbtConfigFile, _.testDependencies).value
       .getOrElse(Seq.empty)
-      .map(d => toModuleId(d) % Test)
+      .map(d => toModuleId(d) % Test),
+    homepage := configValue(sbtConfigFile, _.homepage).value.map(url) orElse homepage.value,
+    licenses ++= configValue(sbtConfigFile, _.licenses).value
+      .getOrElse(Seq.empty)
+      .flatMap(toLicense),
+    versionScheme := configValue(sbtConfigFile, _.versionScheme).value orElse versionScheme.value,
+    developers ++= configValue(sbtConfigFile, _.developers).value
+      .getOrElse(Seq.empty)
+      .map(toDeveloper)
+      .toList
   )
 
   private def configValue[A](
@@ -44,11 +53,29 @@ object SbtConfigPlugin extends AutoPlugin {
 
   private def loadConfig(file: File): Option[ProjectConfig] =
     ConfigParser.parse(file) match {
-      case Right(config) => Some(config)
+      case Right(config) =>
+        warnIfPublishingSettingsWithoutCiRelease(config)
+        Some(config)
       case Left(error) =>
         System.err.println(s"[sbt-config] $error")
         None
     }
+
+  private def warnIfPublishingSettingsWithoutCiRelease(config: ProjectConfig): Unit = {
+    val hasPublishingSettings =
+      config.homepage.isDefined || config.licenses.isDefined || config.developers.isDefined
+    if (hasPublishingSettings) {
+      val ciReleaseClass = "sbtci.CiReleasePlugin"
+      val hasCiRelease = Try(Class.forName(ciReleaseClass)).isSuccess
+      if (!hasCiRelease) {
+        System.out.println(
+          "[sbt-config] Publishing settings detected (homepage, licenses, developers). " +
+            "Consider adding sbt-ci-release plugin for automated releases: " +
+            "addSbtPlugin(\"com.github.sbt\" % \"sbt-ci-release\" % \"1.11.2\")"
+        )
+      }
+    }
+  }
 
   private def ensureConfigFileExists(file: File): Unit =
     if (!file.exists()) {
@@ -56,6 +83,7 @@ object SbtConfigPlugin extends AutoPlugin {
     }
 
   private def createDefaultConfigFile(file: File): Unit = {
+    val knownLicensesList = License.supported.sorted.mkString(", ")
     val content =
       s"""# SBT project configuration
          |# Uncomment and modify the settings you want to use
@@ -82,6 +110,14 @@ object SbtConfigPlugin extends AutoPlugin {
          |# testDependencies = [
          |#   "org.scalatest:scalatest:3.2.19"
          |# ]
+         |
+         |# Publishing settings (for sbt-ci-release)
+         |# homepage = "${ProjectConfig.Example.homepage}"
+         |# licenses = ["MIT"]  # Supported by sbt: $knownLicensesList
+         |# versionScheme = "${ProjectConfig.Example.versionScheme}"  # Options: early-semver, semver-spec, pvp, always, strict
+         |# developers = [
+         |#   { id = "johndoe", name = "John Doe", email = "john@example.com", url = "https://example.com" }
+         |# ]
          |""".stripMargin
 
     val _ = Try {
@@ -96,4 +132,25 @@ object SbtConfigPlugin extends AutoPlugin {
     } else {
       dep.organization % dep.name % dep.version
     }
+
+  private def toLicense(licenseId: String): Option[(String, URL)] =
+    licenseId match {
+      case "Apache2" => Some(sbt.librarymanagement.License.Apache2)
+      case "MIT"     => Some(sbt.librarymanagement.License.MIT)
+      case "CC0"     => Some(sbt.librarymanagement.License.CC0)
+      case "GPL3"    => Some(sbt.librarymanagement.License.GPL3_or_later)
+      case _ =>
+        System.err.println(
+          s"[sbt-config] Unknown license: '$licenseId'. Supported: ${License.supported.mkString(", ")}"
+        )
+        None
+    }
+
+  private def toDeveloper(dev: Developer): sbt.Developer =
+    sbt.Developer(
+      id = dev.id,
+      name = dev.name,
+      email = dev.email,
+      url = url(dev.url)
+    )
 }

@@ -45,15 +45,19 @@ Your `build.sbt` can be minimal or even empty - all settings come from `build.co
 
 ## Configuration Reference
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | String | Project name |
-| `organization` | String | Organization/group ID |
-| `version` | String | Project version |
-| `scalaVersion` | String | Scala compiler version |
-| `scalacOptions` | Array[String] | Scala compiler options |
-| `dependencies` | Array[String] | Compile dependencies |
-| `testDependencies` | Array[String] | Test dependencies |
+| Field              | Type          | Description                                               |
+|--------------------|---------------|-----------------------------------------------------------|
+| `name`             | String        | Project name                                              |
+| `organization`     | String        | Organization/group ID                                     |
+| `version`          | String        | Project version                                           |
+| `scalaVersion`     | String        | Scala compiler version                                    |
+| `scalacOptions`    | Array[String] | Scala compiler options                                    |
+| `dependencies`     | Array[String] | Compile dependencies                                      |
+| `testDependencies` | Array[String] | Test dependencies                                         |
+| `homepage`         | String        | Project homepage URL                                      |
+| `licenses`         | Array[String] | License identifiers (e.g. "Apache2", "CC0", "GPL3, "MIT") |
+| `versionScheme`    | String        | Version scheme (e.g., "early-semver", "semver-spec")      |
+| `developers`       | Array[Object] | List of project developers                                |
 
 ## Dependency Format
 
@@ -95,6 +99,46 @@ scalacOptions = [
   "-unchecked"
 ]
 ```
+
+## Publishing Settings
+
+For publishing to Maven Central with [sbt-ci-release](https://github.com/sbt/sbt-ci-release), configure the following:
+
+```hocon
+homepage = "https://github.com/your-org/your-project"
+
+licenses = ["MIT"]  # or "Apache-2.0", "GPL-3.0", etc.
+
+versionScheme = "early-semver"
+
+developers = [
+  {
+    id = "johndoe"
+    name = "John Doe"
+    email = "john@example.com"
+    url = "https://johndoe.dev"
+  }
+]
+```
+
+### Supported Licenses
+
+The following license identifiers are supported (matching `sbt.librarymanagement.License`):
+
+- `Apache2` - Apache License 2.0
+- `MIT` - MIT License
+- `CC0` - Creative Commons Zero
+- `GPL3` - GNU General Public License v3.0
+
+### Version Schemes
+
+Valid values for `versionScheme`:
+
+- `early-semver` - SemVer with early compatibility (recommended for Scala projects)
+- `semver-spec` - Strict SemVer
+- `pvp` - Package Versioning Policy (Haskell-style)
+- `always` - Always compatible
+- `strict` - Strict versioning
 
 ## Plugin Settings
 

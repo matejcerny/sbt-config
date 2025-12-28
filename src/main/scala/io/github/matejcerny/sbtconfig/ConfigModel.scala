@@ -18,6 +18,29 @@ case class Dependency(
     crossVersion: Boolean = true
 )
 
+/** Represents a project developer.
+  *
+  * @param id
+  *   Developer ID (e.g., GitHub username)
+  * @param name
+  *   Full name
+  * @param email
+  *   Email address
+  * @param url
+  *   Personal/professional URL
+  */
+case class Developer(
+    id: String,
+    name: String,
+    email: String,
+    url: String
+)
+
+/** Supported license identifiers matching sbt.librarymanagement.License */
+object License {
+  val supported: Seq[String] = Seq("Apache2", "MIT", "CC0", "GPL3")
+}
+
 /** Configuration model representing the HOCON config structure. All fields are optional to allow partial configuration.
   *
   * @param name
@@ -34,6 +57,14 @@ case class Dependency(
   *   Compile dependencies
   * @param testDependencies
   *   Test dependencies
+  * @param homepage
+  *   Project homepage URL
+  * @param licenses
+  *   List of license identifiers (e.g., "MIT", "Apache-2.0")
+  * @param versionScheme
+  *   Version scheme (e.g., "early-semver", "semver-spec")
+  * @param developers
+  *   List of project developers
   */
 case class ProjectConfig(
     name: Option[String] = None,
@@ -42,7 +73,11 @@ case class ProjectConfig(
     scalaVersion: Option[String] = None,
     scalacOptions: Option[Seq[String]] = None,
     dependencies: Option[Seq[Dependency]] = None,
-    testDependencies: Option[Seq[Dependency]] = None
+    testDependencies: Option[Seq[Dependency]] = None,
+    homepage: Option[String] = None,
+    licenses: Option[Seq[String]] = None,
+    versionScheme: Option[String] = None,
+    developers: Option[Seq[Developer]] = None
 )
 
 object ProjectConfig {
@@ -62,6 +97,12 @@ object ProjectConfig {
     )
     val testDependencies: Seq[Dependency] = Seq(
       Dependency("org.scalatest", "scalatest", "3.2.19")
+    )
+    val homepage = "https://github.com/example/example-project"
+    val licenses: Seq[String] = Seq("MIT")
+    val versionScheme = "early-semver"
+    val developers: Seq[Developer] = Seq(
+      Developer("johndoe", "John Doe", "john@example.com", "https://example.com")
     )
   }
 }

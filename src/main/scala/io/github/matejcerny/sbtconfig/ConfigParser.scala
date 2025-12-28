@@ -51,8 +51,9 @@ object ConfigParser {
   private def parseConfig(config: Config): Either[String, ProjectConfig] = {
     val depsResult = parseDependencies(getStringList(config, "dependencies"), "dependencies")
     val testDepsResult = parseDependencies(getStringList(config, "testDependencies"), "testDependencies")
+    val developersResult = parseDevelopers(config)
 
-    val errors = Seq(depsResult, testDepsResult).collect { case Left(e) => e }
+    val errors = Seq(depsResult, testDepsResult, developersResult).collect { case Left(e) => e }
 
     if (errors.nonEmpty) {
       Left(errors.mkString("; "))
@@ -65,7 +66,11 @@ object ConfigParser {
           scalaVersion = getString(config, "scalaVersion"),
           scalacOptions = getStringList(config, "scalacOptions"),
           dependencies = depsResult.toOption.flatten,
-          testDependencies = testDepsResult.toOption.flatten
+          testDependencies = testDepsResult.toOption.flatten,
+          homepage = getString(config, "homepage"),
+          licenses = getStringList(config, "licenses"),
+          versionScheme = getString(config, "versionScheme"),
+          developers = developersResult.toOption.flatten
         )
       )
     }
@@ -98,6 +103,47 @@ object ConfigParser {
       case _ =>
         Left(s"Invalid dependency format: '$input'. Expected 'organization:name:version'")
     }
+
+  /** Parse developers from config. Each developer is an object with id, name, email, and url.
+    */
+  private def parseDevelopers(config: Config): Either[String, Option[Seq[Developer]]] =
+    if (!config.hasPath("developers")) {
+      Right(None)
+    } else {
+      Try(config.getConfigList("developers").asScala.toSeq) match {
+        case Failure(e) => Left(s"Failed to parse developers: ${e.getMessage}")
+        case Success(devConfigs) =>
+          val results = devConfigs.zipWithIndex.map { case (devConfig, idx) =>
+            parseDeveloper(devConfig, idx)
+          }
+          val errors = results.collect { case Left(e) => e }
+          if (errors.nonEmpty) {
+            Left(s"Failed to parse developers: ${errors.mkString("; ")}")
+          } else {
+            Right(Some(results.collect { case Right(d) => d }))
+          }
+      }
+    }
+
+  /** Parse a single developer config object, collecting all missing required fields.
+    */
+  private def parseDeveloper(devConfig: Config, index: Int): Either[String, Developer] = {
+    val requiredFields = Seq("id", "name", "email", "url")
+    val missingFields = requiredFields.filterNot(devConfig.hasPath)
+
+    if (missingFields.nonEmpty) {
+      Left(s"developer[$index] missing required fields: ${missingFields.mkString(", ")}")
+    } else {
+      Right(
+        Developer(
+          id = devConfig.getString("id"),
+          name = devConfig.getString("name"),
+          email = devConfig.getString("email"),
+          url = devConfig.getString("url")
+        )
+      )
+    }
+  }
 
   /** Get value from config if path exists.
     */

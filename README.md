@@ -12,6 +12,7 @@ An sbt plugin that allows you to configure your Scala projects using HOCON confi
 - Set Scala version and compiler options
 - Declare dependencies in a simple `organization:artifact:version` format
 - Automatic cross-version handling for Scala dependencies
+- Publishing settings for sbt-ci-release (homepage, licenses, developers)
 - Creates a template `build.conf` if one doesn't exist
 
 ## Installation
@@ -70,6 +71,10 @@ Your `build.sbt` can be minimal or even empty:
 | `scalacOptions` | Array[String] | Scala compiler options |
 | `dependencies` | Array[String] | Compile dependencies |
 | `testDependencies` | Array[String] | Test dependencies |
+| `homepage` | String | Project homepage URL |
+| `licenses` | Array[String] | License identifiers (e.g., "MIT", "Apache2") |
+| `versionScheme` | String | Version scheme (e.g., "early-semver") |
+| `developers` | Array[Object] | List of project developers |
 
 ### Dependency Format
 
@@ -88,6 +93,26 @@ dependencies = [
 ```
 
 All dependencies use Scala cross-versioning (`%%`) by default.
+
+### Publishing Settings
+
+For publishing to Maven Central with [sbt-ci-release](https://github.com/sbt/sbt-ci-release):
+
+```hocon
+homepage = "https://github.com/your-org/your-project"
+licenses = ["MIT"]
+versionScheme = "early-semver"
+developers = [
+  {
+    id = "johndoe",
+    name = "John Doe",
+    email = "john@example.com",
+    url = "https://example.com"
+  }
+]
+```
+
+Supported licenses (matching `sbt.librarymanagement.License`): `Apache2`, `MIT`, `CC0`, `GPL3`
 
 ## HOCON Features
 
@@ -121,8 +146,8 @@ scalacOptions = [
 
 The plugin provides one setting:
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
+| Setting         | Type   | Default      | Description                   |
+|-----------------|--------|--------------|-------------------------------|
 | `sbtConfigFile` | `File` | `build.conf` | Path to the HOCON config file |
 
 To use a different config file:

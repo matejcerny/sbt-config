@@ -39,7 +39,8 @@ lazy val root = project
       "-Ywarn-numeric-widen",
       "-Ywarn-value-discard",
       "-Xfatal-warnings"
-    )
+    ),
+    coverageExcludedFiles := ".*SbtConfigPlugin.*"
   )
 
 lazy val docs = project

@@ -1,9 +1,12 @@
 package io.github.matejcerny.sbtconfig
 
+import io.github.matejcerny.sbtconfig.ProjectConfig.Example
+import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.EitherValues
+
 import java.io.File
+import java.nio.file.Files
 
 class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
 
@@ -169,11 +172,65 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     result.value.version shouldBe Some("1.0.0-SNAPSHOT")
   }
 
-  "ConfigParser.parse(File)" should "return error for non-existent file" in {
+  it should "parse config matching Example values" in {
+    def depToString(d: Dependency): String = s""""${d.organization}:${d.name}:${d.version}""""
+    val config =
+      s"""
+        |name = "${Example.name}"
+        |organization = "${Example.organization}"
+        |version = "${Example.version}"
+        |scalaVersion = "${Example.scalaVersion}"
+        |scalacOptions = ${Example.scalacOptions.map(s => s""""$s"""").mkString("[", ", ", "]")}
+        |dependencies = ${Example.dependencies.map(depToString).mkString("[", ", ", "]")}
+        |testDependencies = ${Example.testDependencies.map(depToString).mkString("[", ", ", "]")}
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isRight shouldBe true
+    val projectConfig = result.value
+    projectConfig.name shouldBe Some(Example.name)
+    projectConfig.organization shouldBe Some(Example.organization)
+    projectConfig.version shouldBe Some(Example.version)
+    projectConfig.scalaVersion shouldBe Some(Example.scalaVersion)
+    projectConfig.scalacOptions shouldBe Some(Example.scalacOptions)
+    projectConfig.dependencies shouldBe Some(Example.dependencies)
+    projectConfig.testDependencies shouldBe Some(Example.testDependencies)
+  }
+
+  "ConfigParser.parse(File)" should "parse a valid config file" in {
+    val tempFile = Files.createTempFile("test-config", ".conf").toFile
+    tempFile.deleteOnExit()
+    Files.writeString(
+      tempFile.toPath,
+      s"""
+        |name = "${Example.name}"
+        |scalaVersion = "${Example.scalaVersion}"
+        |""".stripMargin
+    )
+
+    val result = ConfigParser.parse(tempFile)
+
+    result.isRight shouldBe true
+    result.value.name shouldBe Some(Example.name)
+    result.value.scalaVersion shouldBe Some(Example.scalaVersion)
+  }
+
+  it should "return error for non-existent file" in {
     val file = new File("/non/existent/path/config.conf")
     val result = ConfigParser.parse(file)
 
     result.isLeft shouldBe true
     result.left.value should include("Config file not found")
+  }
+
+  it should "return error when file cannot be read" in {
+    val tempDir = Files.createTempDirectory("test-config-dir")
+    tempDir.toFile.deleteOnExit()
+
+    val result = ConfigParser.parse(tempDir.toFile)
+
+    result.isLeft shouldBe true
+    result.left.value should include("Failed to read config file")
   }
 }

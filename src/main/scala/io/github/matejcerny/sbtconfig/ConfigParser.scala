@@ -21,12 +21,13 @@ object ConfigParser {
     if (!file.exists()) {
       Left(s"Config file not found: ${file.getAbsolutePath}")
     } else {
-      Try {
-        val source = Source.fromFile(file)
-        val content = Try(source.mkString)
-        source.close()
-        content.get
-      } match {
+      (
+        for {
+          source <- Try(Source.fromFile(file))
+          content <- Try(source.mkString)
+          _ = source.close()
+        } yield content
+      ) match {
         case Success(content) => parse(content)
         case Failure(e)       => Left(s"Failed to read config file: ${e.getMessage}")
       }

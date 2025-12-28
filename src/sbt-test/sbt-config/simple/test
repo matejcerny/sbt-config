@@ -1,10 +1,18 @@
 # Run assertions - these fail if values don't match build.conf
+
+# Project metadata
 > checkName
 > checkOrganization
 > checkVersion
 > checkScalaVersion
 > checkScalacOptions
 > checkDependencies
+
+# Publishing settings
+> checkHomepage
+> checkLicenses
+> checkVersionScheme
+> checkDevelopers
 
 # Verify project compiles (dependencies resolve correctly)
 > compile

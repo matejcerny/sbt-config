@@ -1,5 +1,8 @@
 # sbt-config
 
+[![codecov](https://codecov.io/gh/matejcerny/sbt-config/graph/badge.svg?token=MEBX8ZQXGD)](https://codecov.io/gh/matejcerny/sbt-config)
+[![Latest version](https://maven-badges.sml.io/sonatype-central/io.github.matejcerny/sbt-config_2.12_1.0/badge.svg)](https://repo1.maven.org/maven2/io/github/matejcerny/sbt-config_2.12_1.0)
+
 An sbt plugin that allows you to configure your Scala projects using HOCON configuration files instead of `build.sbt`.
 
 ## Features

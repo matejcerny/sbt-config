@@ -13,14 +13,15 @@ ThisBuild / developers := List(
   )
 )
 
-lazy val root = (project in file("."))
+lazy val root = project
+  .in(file("."))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-config",
     description := "Configure sbt projects via HOCON configuration files",
     sbtPlugin := true,
     libraryDependencies ++= Seq(
-      "com.typesafe" % "config" % "1.4.3",
+      "com.typesafe" % "config" % "1.4.5" % Provided,
       "org.scalatest" %% "scalatest" % "3.2.19" % Test
     ),
     scriptedLaunchOpts := {
@@ -40,3 +41,13 @@ lazy val root = (project in file("."))
       "-Xfatal-warnings"
     )
   )
+
+lazy val docs = project
+  .in(file("sbt-config-docs"))
+  .enablePlugins(MdocPlugin, DocusaurusPlugin)
+  .settings(
+    moduleName := "sbt-config-docs",
+    mdocVariables := Map("VERSION" -> version.value),
+    publish / skip := true
+  )
+  .dependsOn(root)

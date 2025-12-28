@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'sbt-config',
   tagline: 'Configure sbt projects via HOCON files',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   future: {
     v4: true,
@@ -94,7 +94,7 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ['java', 'bash'],
+      additionalLanguages: ['java', 'scala', 'bash'],
     },
   } satisfies Preset.ThemeConfig,
 };

@@ -42,6 +42,9 @@ object SbtConfigPlugin extends AutoPlugin {
       .toList
   )
 
+  // Cache parsed configs by file path to avoid reparsing and duplicate warnings
+  private val configCache = scala.collection.mutable.Map[String, Option[ProjectConfig]]()
+
   private def configValue[A](
       fileKey: SettingKey[File],
       extract: ProjectConfig => Option[A]
@@ -52,30 +55,15 @@ object SbtConfigPlugin extends AutoPlugin {
   }
 
   private def loadConfig(file: File): Option[ProjectConfig] =
-    ConfigParser.parse(file) match {
-      case Right(config) =>
-        warnIfPublishingSettingsWithoutCiRelease(config)
-        Some(config)
-      case Left(error) =>
-        System.err.println(s"[sbt-config] $error")
-        None
-    }
-
-  private def warnIfPublishingSettingsWithoutCiRelease(config: ProjectConfig): Unit = {
-    val hasPublishingSettings =
-      config.homepage.isDefined || config.licenses.isDefined || config.developers.isDefined
-    if (hasPublishingSettings) {
-      val ciReleaseClass = "sbtci.CiReleasePlugin"
-      val hasCiRelease = Try(Class.forName(ciReleaseClass)).isSuccess
-      if (!hasCiRelease) {
-        System.out.println(
-          "[sbt-config] Publishing settings detected (homepage, licenses, developers). " +
-            "Consider adding sbt-ci-release plugin for automated releases: " +
-            "addSbtPlugin(\"com.github.sbt\" % \"sbt-ci-release\" % \"1.11.2\")"
-        )
+    configCache.getOrElseUpdate(
+      file.getAbsolutePath,
+      ConfigParser.parse(file) match {
+        case Right(config) => Some(config)
+        case Left(error) =>
+          System.err.println(s"[sbt-config] $error")
+          None
       }
-    }
-  }
+    )
 
   private def ensureConfigFileExists(file: File): Unit =
     if (!file.exists()) {
@@ -85,8 +73,8 @@ object SbtConfigPlugin extends AutoPlugin {
   private def createDefaultConfigFile(file: File): Unit = {
     val knownLicensesList = License.supported.sorted.mkString(", ")
     val content =
-      s"""# SBT project configuration
-         |# Uncomment and modify the settings you want to use
+      s"""# sbt-config: HOCON configuration for sbt projects
+         |# Documentation: https://matejcerny.github.io/sbt-config/
          |
          |# name = "${ProjectConfig.Example.name}"
          |# organization = "${ProjectConfig.Example.organization}"
@@ -111,9 +99,9 @@ object SbtConfigPlugin extends AutoPlugin {
          |#   "org.scalatest:scalatest:3.2.19"
          |# ]
          |
-         |# Publishing settings (for sbt-ci-release)
+         |# Publishing settings (requires sbt-ci-release plugin)
          |# homepage = "${ProjectConfig.Example.homepage}"
-         |# licenses = ["MIT"]  # Supported by sbt: $knownLicensesList
+         |# licenses = ["MIT"]  # Supported: $knownLicensesList
          |# versionScheme = "${ProjectConfig.Example.versionScheme}"  # Options: early-semver, semver-spec, pvp, always, strict
          |# developers = [
          |#   { id = "johndoe", name = "John Doe", email = "john@example.com", url = "https://example.com" }

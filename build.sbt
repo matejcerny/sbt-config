@@ -48,7 +48,11 @@ lazy val docs = project
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
   .settings(
     moduleName := "sbt-config-docs",
-    mdocVariables := Map("VERSION" -> version.value),
+    mdocVariables := Map(
+      "VERSION" -> dynverGitDescribeOutput.value
+        .map(_.ref.dropPrefix)
+        .getOrElse(version.value)
+    ),
     publish / skip := true
   )
   .dependsOn(root)

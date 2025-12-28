@@ -271,6 +271,18 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     result.left.value should include("id")
   }
 
+  it should "return error when developers is not a list of objects" in {
+    val config =
+      """
+        |developers = "not a list"
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isLeft shouldBe true
+    result.left.value should include("Failed to parse developers")
+  }
+
   "License.supported" should "contain sbt-supported licenses" in {
     License.supported should contain("MIT")
     License.supported should contain("Apache2")

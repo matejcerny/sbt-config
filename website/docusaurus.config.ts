@@ -18,7 +18,11 @@ const config: Config = {
   projectName: 'sbt-config',
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
@@ -90,7 +94,7 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ['scala', 'java', 'bash'],
+      additionalLanguages: ['java', 'bash'],
     },
   } satisfies Preset.ThemeConfig,
 };

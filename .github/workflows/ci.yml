@@ -32,8 +32,14 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: target/scala-2.12/scoverage-report/scoverage.xml
 
-      - name: Run scripted tests
-        run: sbt scripted
+      - name: Run cross-compiled unit tests
+        run: sbt +test
+
+      - name: Run sbt 1.x scripted tests
+        run: sbt "scripted sbt-config/simple"
+
+      - name: Run sbt 2.x scripted tests
+        run: sbt "++3.8.1; scripted sbt-config/simple-sbt2"
 
   scalafmt:
     runs-on: ubuntu-latest

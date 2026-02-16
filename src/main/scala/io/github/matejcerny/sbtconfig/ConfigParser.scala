@@ -2,7 +2,7 @@ package io.github.matejcerny.sbtconfig
 
 import com.typesafe.config.{ Config, ConfigFactory }
 import java.io.File
-import scala.collection.JavaConverters._
+import compat.CollectionConverters._
 import scala.io.Source
 import scala.util.{ Failure, Success, Try }
 

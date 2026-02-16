@@ -54,3 +54,4 @@ Your `build.sbt` can be minimal or even empty - all settings come from `build.co
 - **Cross-versioning** - Automatic handling of Scala cross-version dependencies
 - **Publishing** - Configure homepage, licenses, and developers for Maven Central (requires [sbt-ci-release](https://github.com/sbt/sbt-ci-release))
 - **Template generation** - Creates a commented `build.conf` template if one doesn't exist
+- **sbt 1.x and 2.x** - Cross-built to support both sbt generations

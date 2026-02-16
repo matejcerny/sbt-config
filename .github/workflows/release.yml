@@ -24,11 +24,17 @@ jobs:
       - name: Set up sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Run tests
-        run: sbt test scripted
+      - name: Run cross-compiled tests
+        run: sbt +test
+
+      - name: Run sbt 1.x scripted tests
+        run: sbt "scripted sbt-config/simple"
+
+      - name: Run sbt 2.x scripted tests
+        run: sbt "++3.8.1; scripted sbt-config/simple-sbt2"
 
       - name: Publish to Sonatype Central
-        run: sbt ci-release
+        run: sbt +ci-release
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
           PGP_SECRET: ${{ secrets.PGP_SECRET }}

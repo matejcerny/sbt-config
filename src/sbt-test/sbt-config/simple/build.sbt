@@ -28,9 +28,17 @@ checkScalacOptions := {
 
 val checkDependencies = taskKey[Unit]("Check dependencies")
 checkDependencies := {
-  val deps = libraryDependencies.value.map(m => s"${m.organization}:${m.name}")
-  assert(deps.exists(_.contains("cats-core")), s"Expected cats-core in $deps")
-  assert(deps.exists(d => d.contains("scalatest")), s"Expected scalatest in $deps")
+  val deps = libraryDependencies.value
+  val depsStr = deps.map(m => s"${m.organization}:${m.name}")
+  assert(depsStr.exists(_.contains("cats-core")), s"Expected cats-core in $depsStr")
+  assert(depsStr.exists(_.contains("gson")), s"Expected gson in $depsStr")
+  assert(depsStr.exists(d => d.contains("scalatest")), s"Expected scalatest in $depsStr")
+
+  // Verify cross-version types
+  val catsDep = deps.find(_.name.contains("cats-core")).get
+  assert(catsDep.crossVersion.isInstanceOf[sbt.librarymanagement.CrossVersion.Binary], s"Expected cats-core to use Binary cross-version, got ${catsDep.crossVersion}")
+  val gsonDep = deps.find(_.name == "gson").get
+  assert(gsonDep.crossVersion == sbt.librarymanagement.Disabled(), s"Expected gson to use Disabled cross-version, got ${gsonDep.crossVersion}")
 }
 
 // Publishing settings assertions

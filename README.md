@@ -21,7 +21,7 @@ An sbt plugin that allows you to configure your Scala projects using HOCON confi
 Add the plugin to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("io.github.matejcerny" % "sbt-config" % "0.3.0")
+addSbtPlugin("io.github.matejcerny" % "sbt-config" % "0.4.0")
 ```
 
 Then configure your project in `build.conf`:

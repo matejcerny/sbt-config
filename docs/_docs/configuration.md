@@ -1,26 +1,22 @@
----
-sidebar_position: 2
----
-
 # Configuration Reference
 
 All configuration fields are optional. The plugin will use sbt defaults for any field not specified.
 
 ## Available Fields
 
-| Field              | Type                    | Description                                                |
-|--------------------|-------------------------|------------------------------------------------------------|
-| `name`             | String                  | Project name                                               |
-| `organization`     | String                  | Organization/group ID                                      |
-| `version`          | String                  | Project version                                            |
-| `scalaVersion`     | String                  | Scala compiler version                                     |
-| `scalacOptions`    | Array[String]           | Scala compiler options                                     |
-| `dependencies`     | Array[String] or Object | Compile dependencies (see [Dependencies](dependencies.md)) |
-| `testDependencies` | Array[String] or Object | Test dependencies (see [Dependencies](dependencies.md))    |
-| `homepage`         | String                  | Project homepage URL                                       |
-| `licenses`         | Array[String]           | License identifiers (e.g., "MIT", "Apache2")               |
-| `versionScheme`    | String                  | Version scheme (e.g., "early-semver", "semver-spec")       |
-| `developers`       | Array[Object]           | List of project developers                                 |
+| Field              | Type                    | Description                                                  |
+|--------------------|-------------------------|--------------------------------------------------------------|
+| `name`             | String                  | Project name                                                 |
+| `organization`     | String                  | Organization/group ID                                        |
+| `version`          | String                  | Project version                                              |
+| `scalaVersion`     | String                  | Scala compiler version                                       |
+| `scalacOptions`    | Array[String]           | Scala compiler options                                       |
+| `dependencies`     | Array[String] or Object | Compile dependencies (see [Dependencies](./dependencies.md)) |
+| `testDependencies` | Array[String] or Object | Test dependencies (see [Dependencies](./dependencies.md))    |
+| `homepage`         | String                  | Project homepage URL                                         |
+| `licenses`         | Array[String]           | License identifiers (e.g., "MIT", "Apache2")                 |
+| `versionScheme`    | String                  | Version scheme (e.g., "early-semver", "semver-spec")         |
+| `developers`       | Array[Object]           | List of project developers                                   |
 
 ## Example
 

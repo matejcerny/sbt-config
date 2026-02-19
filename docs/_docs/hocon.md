@@ -1,7 +1,3 @@
----
-sidebar_position: 5
----
-
 # HOCON Features
 
 Since the configuration uses [HOCON](https://github.com/lightbend/config/blob/main/HOCON.md) (Human-Optimized Config Object Notation), you can leverage its powerful features.

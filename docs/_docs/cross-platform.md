@@ -1,12 +1,8 @@
----
-sidebar_position: 6
----
+# Cross-Platform Dependencies
 
-# Cross-Platform Dependencies (Experimental)
-
-:::warning Experimental
-Cross-platform dependency support (Scala.js, Scala Native) is experimental. It may not work correctly and may change in future versions.
-:::
+<div class="admonition warning" style="padding: 1.25rem 1.5rem; display: block; margin-top: 1.5rem; border-left: 4px solid;">
+  <p style="margin: 0;">Cross-platform dependency support (Scala.js, Scala Native) is experimental. It may not work correctly and may change in future versions.</p>
+</div>
 
 For projects that target Scala.js or Scala Native, the plugin supports additional dependency keys and platform-aware filtering.
 
@@ -16,7 +12,7 @@ Cross-platform projects still require a `build.sbt` to enable platform plugins a
 
 ```scala
 // project/plugins.sbt
-addSbtPlugin("io.github.matejcerny" % "sbt-config" % "@VERSION@")
+addSbtPlugin("io.github.matejcerny" % "sbt-config" % "{{ projectVersion }}")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.2")
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.10")
 ```

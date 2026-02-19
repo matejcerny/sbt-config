@@ -47,8 +47,6 @@ metals.sbt
 target/
 # Node
 node_modules/
-website/build/
-website/.docusaurus/
 lib_managed/
 src_managed/
 project/boot/

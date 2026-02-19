@@ -1,5 +1,7 @@
 package io.github.matejcerny.sbtconfig
 
+import io.github.matejcerny.sbtconfig.model._
+import io.github.matejcerny.sbtconfig.parser.ConfigParser
 import sbt.{ Developer => _, License => _, _ }
 import sbt.Keys._
 import java.io.{ File, PrintWriter }
@@ -15,6 +17,18 @@ object SbtConfigPlugin extends AutoPlugin {
 
   import autoImport._
 
+  // Key with the same label as sbt-platform-deps' platformDepsCrossVersion.
+  // When a platform plugin (sbt-scalajs, sbt-scala-native) is present,
+  // it overrides this in projectSettings to include the platform suffix,
+  // giving js/native dependencies the equivalent of %%% behavior.
+  private val platformDepsCrossVersion = settingKey[CrossVersion](
+    "The cross version used by %%% for platform-specific dependencies"
+  )
+
+  override def globalSettings: Seq[Setting[_]] = Seq(
+    platformDepsCrossVersion := CrossVersion.binary
+  )
+
   override def projectSettings: Seq[Setting[_]] = Seq(
     sbtConfigFile := baseDirectory.value / "build.conf"
   ) ++ configSettings
@@ -25,16 +39,20 @@ object SbtConfigPlugin extends AutoPlugin {
     version := configValue(sbtConfigFile, _.version).value.getOrElse(version.value),
     scalaVersion := configValue(sbtConfigFile, _.scalaVersion).value.getOrElse(scalaVersion.value),
     scalacOptions ++= configValue(sbtConfigFile, _.scalacOptions).value.getOrElse(Seq.empty),
-    libraryDependencies ++= configValue(sbtConfigFile, _.dependencies).value
-      .getOrElse(Seq.empty)
-      .map(toModuleId),
-    libraryDependencies ++= configValue(sbtConfigFile, _.testDependencies).value
-      .getOrElse(Seq.empty)
-      .map(d => toModuleId(d) % Test),
+    libraryDependencies ++= {
+      val deps = configValue(sbtConfigFile, _.dependencies).value.getOrElse(Seq.empty)
+      val platformCV = platformDepsCrossVersion.value
+      deps.map(toModuleId(_, platformCV))
+    },
+    libraryDependencies ++= {
+      val deps = configValue(sbtConfigFile, _.testDependencies).value.getOrElse(Seq.empty)
+      val platformCV = platformDepsCrossVersion.value
+      deps.map(toModuleId(_, platformCV) % Test)
+    },
     homepage := configValue(sbtConfigFile, _.homepage).value.map(url) orElse homepage.value,
     licenses ++= configValue(sbtConfigFile, _.licenses).value
       .getOrElse(Seq.empty)
-      .flatMap(compat.toLicense),
+      .flatMap(License.toLicense),
     versionScheme := configValue(sbtConfigFile, _.versionScheme).value orElse versionScheme.value,
     developers ++= configValue(sbtConfigFile, _.developers).value
       .getOrElse(Seq.empty)
@@ -88,13 +106,20 @@ object SbtConfigPlugin extends AutoPlugin {
          |# ]
          |
          |# Dependencies (format: "organization:artifact:version")
-         |# Equivalent to: libraryDependencies += "org.typelevel" %% "cats-core" % "2.13.0"
+         |# Flat list — all use Scala cross-versioning (%%)
          |# dependencies = [
          |#   "org.typelevel:cats-core:2.13.0"
          |# ]
+         |#
+         |# Nested object — specify dependency type
+         |# dependencies {
+         |#   scala  = ["org.typelevel:cats-core:2.13.0"]   # %%
+         |#   java   = ["com.google.code.gson:gson:2.11.0"] # %
+         |#   js     = ["org.scala-js:scalajs-dom:2.8.0"]   # %%% (Scala.js)
+         |#   native = ["com.armanbilge:epollcat:0.1.6"]     # %%% (Scala Native)
+         |# }
          |
          |# Test dependencies (automatically added with Test scope)
-         |# Equivalent to: libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test
          |# testDependencies = [
          |#   "org.scalatest:scalatest:3.2.19"
          |# ]
@@ -114,11 +139,12 @@ object SbtConfigPlugin extends AutoPlugin {
     }
   }
 
-  private def toModuleId(dep: Dependency): ModuleID =
-    if (dep.crossVersion) {
-      dep.organization %% dep.name % dep.version
-    } else {
-      dep.organization % dep.name % dep.version
+  private def toModuleId(dep: Dependency, platformCV: CrossVersion): ModuleID =
+    dep.crossVersionType match {
+      case CrossVersionType.Java => dep.organization % dep.name % dep.version
+      case CrossVersionType.ScalaJs | CrossVersionType.ScalaNative =>
+        (dep.organization % dep.name % dep.version).cross(platformCV)
+      case _ => dep.organization %% dep.name % dep.version
     }
 
   private def toDeveloper(dev: Developer): sbt.Developer =

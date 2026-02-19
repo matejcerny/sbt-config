@@ -1,0 +1,90 @@
+package io.github.matejcerny.sbtconfig.parser
+
+import com.typesafe.config.{ Config, ConfigFactory }
+import io.github.matejcerny.sbtconfig.compat.CollectionConverters._
+import io.github.matejcerny.sbtconfig.model.ProjectConfig
+import java.io.File
+import scala.io.Source
+import scala.util.{ Failure, Success, Try }
+
+/** Parser for HOCON configuration files. Converts Typesafe Config to ProjectConfig model. */
+object ConfigParser {
+
+  /** Parse a HOCON config file into ProjectConfig.
+    *
+    * @param file
+    *   The config file to parse
+    * @return
+    *   Either an error message or the parsed ProjectConfig
+    */
+  def parse(file: File): Either[String, ProjectConfig] =
+    if (!file.exists()) {
+      Left(s"Config file not found: ${file.getAbsolutePath}")
+    } else {
+      (
+        for {
+          source <- Try(Source.fromFile(file))
+          content <- Try(source.mkString)
+          _ = source.close()
+        } yield content
+      ) match {
+        case Success(content) => parse(content)
+        case Failure(e)       => Left(s"Failed to read config file: ${e.getMessage}")
+      }
+    }
+
+  /** Parse a HOCON config string into ProjectConfig.
+    *
+    * @param content
+    *   The HOCON config string to parse
+    * @return
+    *   Either an error message or the parsed ProjectConfig
+    */
+  def parse(content: String): Either[String, ProjectConfig] =
+    Try(ConfigFactory.parseString(content).resolve()) match {
+      case Success(config) => parseConfig(config)
+      case Failure(e)      => Left(s"Failed to parse config: ${e.getMessage}")
+    }
+
+  /** Parse a Typesafe Config object into ProjectConfig. Collects all errors instead of failing on the first one. */
+  private def parseConfig(config: Config): Either[String, ProjectConfig] = {
+    val depsResult = DependencyParser.parseDependencyField(config, "dependencies")
+    val testDepsResult = DependencyParser.parseDependencyField(config, "testDependencies")
+    val developersResult = DeveloperParser.parseDevelopers(config)
+
+    val errors = Seq(depsResult, testDepsResult, developersResult).collect { case Left(e) => e }
+
+    if (errors.nonEmpty) {
+      Left(errors.mkString("; "))
+    } else {
+      Right(
+        ProjectConfig(
+          name = getString(config, "name"),
+          organization = getString(config, "organization"),
+          version = getString(config, "version"),
+          scalaVersion = getString(config, "scalaVersion"),
+          scalacOptions = getStringList(config, "scalacOptions"),
+          dependencies = depsResult.toOption.flatten,
+          testDependencies = testDepsResult.toOption.flatten,
+          homepage = getString(config, "homepage"),
+          licenses = getStringList(config, "licenses"),
+          versionScheme = getString(config, "versionScheme"),
+          developers = developersResult.toOption.flatten
+        )
+      )
+    }
+  }
+
+  /** Get value from config if path exists. */
+  private def getOpt[A](config: Config, path: String)(extract: Config => A): Option[A] =
+    if (config.hasPath(path)) Some(extract(config))
+    else None
+
+  /** Get an optional string value from config. */
+  private def getString(config: Config, path: String): Option[String] =
+    getOpt(config, path)(_.getString(path))
+
+  /** Get an optional list of strings from config. */
+  private def getStringList(config: Config, path: String): Option[Seq[String]] =
+    getOpt(config, path)(_.getStringList(path).asScala.toSeq)
+}

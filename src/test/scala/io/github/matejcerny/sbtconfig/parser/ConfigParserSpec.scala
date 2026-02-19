@@ -1,6 +1,7 @@
-package io.github.matejcerny.sbtconfig
+package io.github.matejcerny.sbtconfig.parser
 
-import io.github.matejcerny.sbtconfig.ProjectConfig.Example
+import io.github.matejcerny.sbtconfig.model._
+import io.github.matejcerny.sbtconfig.model.ProjectConfig.Example
 import org.scalatest.EitherValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -88,44 +89,6 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     result.left.value should include("Failed to parse config")
   }
 
-  it should "return error for invalid dependency format" in {
-    val config =
-      """
-        |dependencies = ["invalid-dependency"]
-        |""".stripMargin
-
-    val result = ConfigParser.parse(config)
-
-    result.isLeft shouldBe true
-    result.left.value should include("Failed to parse dependencies")
-    result.left.value should include("Invalid dependency format")
-  }
-
-  it should "return error for dependency with too many parts" in {
-    val config =
-      """
-        |dependencies = ["org:name:version:extra"]
-        |""".stripMargin
-
-    val result = ConfigParser.parse(config)
-
-    result.isLeft shouldBe true
-    result.left.value should include("Invalid dependency format")
-  }
-
-  it should "collect all dependency parsing errors within a field" in {
-    val config =
-      """
-        |dependencies = ["invalid1", "invalid2"]
-        |""".stripMargin
-
-    val result = ConfigParser.parse(config)
-
-    result.isLeft shouldBe true
-    result.left.value should include("invalid1")
-    result.left.value should include("invalid2")
-  }
-
   it should "collect errors from both dependencies and testDependencies" in {
     val config =
       """
@@ -140,22 +103,6 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     result.left.value should include("invalid-dep")
     result.left.value should include("testDependencies")
     result.left.value should include("invalid-test-dep")
-  }
-
-  it should "trim whitespace from dependency parts" in {
-    val config =
-      """
-        |dependencies = [" org.typelevel : cats-core : 2.13.0 "]
-        |""".stripMargin
-
-    val result = ConfigParser.parse(config)
-
-    result.isRight shouldBe true
-    result.value.dependencies shouldBe Some(
-      Seq(
-        Dependency("org.typelevel", "cats-core", "2.13.0")
-      )
-    )
   }
 
   it should "handle HOCON substitutions" in {
@@ -233,62 +180,6 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
         Developer("dev2", "Developer Two", "dev2@example.com", "https://dev2.example.com")
       )
     )
-  }
-
-  it should "return error for invalid developer format with all missing fields" in {
-    val config =
-      """
-        |developers = [
-        |  { id = "dev1", name = "Developer One" }
-        |]
-        |""".stripMargin
-
-    val result = ConfigParser.parse(config)
-
-    result.isLeft shouldBe true
-    result.left.value should include("Failed to parse developers")
-    result.left.value should include("email")
-    result.left.value should include("url")
-  }
-
-  it should "collect errors from multiple invalid developers" in {
-    val config =
-      """
-        |developers = [
-        |  { id = "dev1" },
-        |  { name = "Developer Two" }
-        |]
-        |""".stripMargin
-
-    val result = ConfigParser.parse(config)
-
-    result.isLeft shouldBe true
-    result.left.value should include("developer[0]")
-    result.left.value should include("developer[1]")
-    result.left.value should include("name")
-    result.left.value should include("email")
-    result.left.value should include("url")
-    result.left.value should include("id")
-  }
-
-  it should "return error when developers is not a list of objects" in {
-    val config =
-      """
-        |developers = "not a list"
-        |""".stripMargin
-
-    val result = ConfigParser.parse(config)
-
-    result.isLeft shouldBe true
-    result.left.value should include("Failed to parse developers")
-  }
-
-  "License.supported" should "contain sbt-supported licenses" in {
-    License.supported should contain("MIT")
-    License.supported should contain("Apache2")
-    License.supported should contain("GPL3")
-    License.supported should contain("CC0")
-    License.supported should have size 4
   }
 
   "ConfigParser.parse(File)" should "parse a valid config file" in {

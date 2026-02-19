@@ -1,45 +1,4 @@
-package io.github.matejcerny.sbtconfig
-
-/** Represents a single dependency.
-  *
-  * @param organization
-  *   Group/organization ID (e.g., "org.typelevel")
-  * @param name
-  *   Artifact name (e.g., "cats-core")
-  * @param version
-  *   Version string (e.g., "2.13.0")
-  * @param crossVersion
-  *   Whether to use Scala cross-versioning (%% in sbt)
-  */
-case class Dependency(
-    organization: String,
-    name: String,
-    version: String,
-    crossVersion: Boolean = true
-)
-
-/** Represents a project developer.
-  *
-  * @param id
-  *   Developer ID (e.g., GitHub username)
-  * @param name
-  *   Full name
-  * @param email
-  *   Email address
-  * @param url
-  *   Personal/professional URL
-  */
-case class Developer(
-    id: String,
-    name: String,
-    email: String,
-    url: String
-)
-
-/** Supported license identifiers matching sbt.librarymanagement.License */
-object License {
-  val supported: Seq[String] = Seq("Apache2", "MIT", "CC0", "GPL3")
-}
+package io.github.matejcerny.sbtconfig.model
 
 /** Configuration model representing the HOCON config structure. All fields are optional to allow partial configuration.
   *

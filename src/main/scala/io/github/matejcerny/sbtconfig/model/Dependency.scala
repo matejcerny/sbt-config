@@ -10,10 +10,13 @@ package io.github.matejcerny.sbtconfig.model
   *   Version string (e.g., "2.13.0")
   * @param crossVersionType
   *   How the artifact name is cross-versioned (default: Scala `%%`)
+  * @param platform
+  *   Which platform(s) this dependency targets (default: Shared = all platforms)
   */
 case class Dependency(
     organization: String,
     name: String,
     version: String,
-    crossVersionType: CrossVersionType = CrossVersionType.Scala
+    crossVersionType: CrossVersionType = CrossVersionType.Scala,
+    platform: Platform = Platform.Shared
 )

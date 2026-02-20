@@ -42,12 +42,12 @@ object SbtConfigPlugin extends AutoPlugin {
     libraryDependencies ++= {
       val deps = configValue(sbtConfigFile, _.dependencies).value.getOrElse(Seq.empty)
       val platformCV = platformDepsCrossVersion.value
-      deps.map(toModuleId(_, platformCV))
+      filterDeps(deps, platformCV).map(toModuleId(_, platformCV))
     },
     libraryDependencies ++= {
       val deps = configValue(sbtConfigFile, _.testDependencies).value.getOrElse(Seq.empty)
       val platformCV = platformDepsCrossVersion.value
-      deps.map(toModuleId(_, platformCV) % Test)
+      filterDeps(deps, platformCV).map(toModuleId(_, platformCV) % Test)
     },
     homepage := configValue(sbtConfigFile, _.homepage).value.map(url) orElse homepage.value,
     licenses ++= configValue(sbtConfigFile, _.licenses).value
@@ -106,17 +106,30 @@ object SbtConfigPlugin extends AutoPlugin {
          |# ]
          |
          |# Dependencies (format: "organization:artifact:version")
-         |# Flat list — all use Scala cross-versioning (%%)
+         |#
+         |# Flat list — all use Scala cross-versioning (%%), included in all projects
          |# dependencies = [
          |#   "org.typelevel:cats-core:2.13.0"
          |# ]
          |#
-         |# Nested object — specify dependency type
+         |# Language split — scala/java shared everywhere, js/native only in platform projects
          |# dependencies {
-         |#   scala  = ["org.typelevel:cats-core:2.13.0"]   # %%
-         |#   java   = ["com.google.code.gson:gson:2.11.0"] # %
-         |#   js     = ["org.scala-js:scalajs-dom:2.8.0"]   # %%% (Scala.js)
-         |#   native = ["com.armanbilge:epollcat:0.1.6"]     # %%% (Scala Native)
+         |#   scala  = ["org.typelevel:cats-core:2.13.0"]   # %% (all projects)
+         |#   java   = ["com.google.code.gson:gson:2.11.0"] # %  (all projects)
+         |#   js     = ["org.scala-js:scalajs-dom:2.8.0"]   # %%% (Scala.js projects only)
+         |#   native = ["com.armanbilge:epollcat:0.1.6"]     # %%% (Scala Native projects only)
+         |# }
+         |#
+         |# Full matrix — for cross-compiled projects (JVM + JS/Native)
+         |# dependencies {
+         |#   shared {
+         |#     scala = ["org.typelevel:cats-core:2.13.0"]
+         |#   }
+         |#   jvm {
+         |#     java = ["com.google.code.gson:gson:2.11.0"]
+         |#   }
+         |#   js     = ["org.scala-js:scalajs-dom:2.8.0"]
+         |#   native = ["com.armanbilge:epollcat:0.1.6"]
          |# }
          |
          |# Test dependencies (automatically added with Test scope)
@@ -136,6 +149,20 @@ object SbtConfigPlugin extends AutoPlugin {
     val _ = Try {
       val writer = new PrintWriter(file)
       Try(writer.write(content)).foreach(_ => writer.close())
+    }
+  }
+
+  // Filter dependencies based on detected platform.
+  // Universal deps (Shared) always included. Jvm deps only on JVM.
+  // Js/Native deps only when a platform plugin is active (platformCV != CrossVersion.binary).
+  private def filterDeps(deps: Seq[Dependency], platformCV: CrossVersion): Seq[Dependency] = {
+    val isJvm = platformCV == CrossVersion.binary
+    deps.filter { dep =>
+      dep.platform match {
+        case model.Platform.Shared                         => true
+        case model.Platform.Jvm                            => isJvm
+        case model.Platform.Js | model.Platform.Native => !isJvm
+      }
     }
   }
 

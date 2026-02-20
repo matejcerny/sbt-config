@@ -1,0 +1,3 @@
+# Verify that manually overriding sbtConfigPlatform controls dependency filtering
+# even when no platform plugin (sbt-scalajs / sbt-scala-native) is present
+> checkDeps

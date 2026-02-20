@@ -64,14 +64,19 @@ developers = [
 
 ## Plugin Settings
 
-The plugin provides one sbt setting to customize the config file location:
-
-| Setting         | Type   | Default      | Description                   |
-|-----------------|--------|--------------|-------------------------------|
-| `sbtConfigFile` | `File` | `build.conf` | Path to the HOCON config file |
+| Setting             | Type       | Default        | Description                                                                 |
+|---------------------|------------|----------------|-----------------------------------------------------------------------------|
+| `sbtConfigFile`     | `File`     | `build.conf`   | Path to the HOCON config file                                               |
+| `sbtConfigPlatform` | `Platform` | auto-detected  | Project platform (`Platform.Jvm`, `Platform.Js`, or `Platform.Native`)      |
 
 To use a different config file:
 
 ```scala
 sbtConfigFile := baseDirectory.value / "project.conf"
+```
+
+The platform is auto-detected from sbt-scalajs / sbt-scala-native plugins. Override it if needed:
+
+```scala
+sbtConfigPlatform := Platform.Js
 ```

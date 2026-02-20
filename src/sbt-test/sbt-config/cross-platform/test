@@ -1,0 +1,3 @@
+# Verify platform-aware dependency filtering
+> checkJvmDeps
+> checkJsDeps

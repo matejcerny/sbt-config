@@ -13,6 +13,9 @@ object SbtConfigPlugin extends AutoPlugin {
 
   object autoImport {
     val sbtConfigFile = settingKey[File]("The HOCON configuration file (default: build.conf)")
+    val sbtConfigPlatform =
+      settingKey[Platform]("The platform of the current project (auto-detected from platform plugins)")
+    val Platform = model.Platform
   }
 
   import autoImport._
@@ -30,7 +33,8 @@ object SbtConfigPlugin extends AutoPlugin {
   )
 
   override def projectSettings: Seq[Setting[_]] = Seq(
-    sbtConfigFile := baseDirectory.value / "build.conf"
+    sbtConfigFile := baseDirectory.value / "build.conf",
+    sbtConfigPlatform := detectPlatform(platformDepsCrossVersion.value)
   ) ++ configSettings
 
   private def configSettings: Seq[Setting[_]] = Seq(
@@ -41,13 +45,15 @@ object SbtConfigPlugin extends AutoPlugin {
     scalacOptions ++= configValue(sbtConfigFile, _.scalacOptions).value.getOrElse(Seq.empty),
     libraryDependencies ++= {
       val deps = configValue(sbtConfigFile, _.dependencies).value.getOrElse(Seq.empty)
+      val platform = sbtConfigPlatform.value
       val platformCV = platformDepsCrossVersion.value
-      deps.map(toModuleId(_, platformCV))
+      filterDeps(deps, platform).map(toModuleId(_, platformCV))
     },
     libraryDependencies ++= {
       val deps = configValue(sbtConfigFile, _.testDependencies).value.getOrElse(Seq.empty)
+      val platform = sbtConfigPlatform.value
       val platformCV = platformDepsCrossVersion.value
-      deps.map(toModuleId(_, platformCV) % Test)
+      filterDeps(deps, platform).map(toModuleId(_, platformCV) % Test)
     },
     homepage := configValue(sbtConfigFile, _.homepage).value.map(url) orElse homepage.value,
     licenses ++= configValue(sbtConfigFile, _.licenses).value
@@ -106,17 +112,30 @@ object SbtConfigPlugin extends AutoPlugin {
          |# ]
          |
          |# Dependencies (format: "organization:artifact:version")
-         |# Flat list — all use Scala cross-versioning (%%)
+         |#
+         |# Flat list — all use Scala cross-versioning (%%), included in all projects
          |# dependencies = [
          |#   "org.typelevel:cats-core:2.13.0"
          |# ]
          |#
-         |# Nested object — specify dependency type
+         |# Language split — scala/java shared everywhere, js/native only in platform projects
          |# dependencies {
-         |#   scala  = ["org.typelevel:cats-core:2.13.0"]   # %%
-         |#   java   = ["com.google.code.gson:gson:2.11.0"] # %
-         |#   js     = ["org.scala-js:scalajs-dom:2.8.0"]   # %%% (Scala.js)
-         |#   native = ["com.armanbilge:epollcat:0.1.6"]     # %%% (Scala Native)
+         |#   scala  = ["org.typelevel:cats-core:2.13.0"]   # %% (all projects)
+         |#   java   = ["com.google.code.gson:gson:2.11.0"] # %  (all projects)
+         |#   js     = ["org.scala-js:scalajs-dom:2.8.0"]   # %%% (Scala.js projects only)
+         |#   native = ["com.armanbilge:epollcat:0.1.6"]     # %%% (Scala Native projects only)
+         |# }
+         |#
+         |# Full matrix — for cross-compiled projects (JVM + JS/Native)
+         |# dependencies {
+         |#   shared {
+         |#     scala = ["org.typelevel:cats-core:2.13.0"]
+         |#   }
+         |#   jvm {
+         |#     java = ["com.google.code.gson:gson:2.11.0"]
+         |#   }
+         |#   js     = ["org.scala-js:scalajs-dom:2.8.0"]
+         |#   native = ["com.armanbilge:epollcat:0.1.6"]
          |# }
          |
          |# Test dependencies (automatically added with Test scope)
@@ -138,6 +157,30 @@ object SbtConfigPlugin extends AutoPlugin {
       Try(writer.write(content)).foreach(_ => writer.close())
     }
   }
+
+  // Detect the platform from the cross-version set by platform plugins.
+  // sbt-scalajs sets a prefix starting with "sjs", sbt-scala-native with "native".
+  // Both Binary and Full carry a prefix field, so we inspect either.
+  private def detectPlatform(cv: CrossVersion): Platform = {
+    val prefix = cv match {
+      case b: CrossVersion.Binary => b.prefix
+      case f: CrossVersion.Full   => f.prefix
+      case _                      => ""
+    }
+    if (prefix.startsWith("sjs")) model.Platform.Js
+    else if (prefix.startsWith("native")) model.Platform.Native
+    else model.Platform.Jvm
+  }
+
+  // Filter dependencies based on detected platform.
+  // Shared deps always included. Platform-specific deps only when the project matches.
+  private def filterDeps(deps: Seq[Dependency], platform: Platform): Seq[Dependency] =
+    deps.filter { dep =>
+      dep.platform match {
+        case model.Platform.Shared => true
+        case p                     => p == platform
+      }
+    }
 
   private def toModuleId(dep: Dependency, platformCV: CrossVersion): ModuleID =
     dep.crossVersionType match {

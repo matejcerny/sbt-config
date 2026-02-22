@@ -1,0 +1,4 @@
+# Verify platform-aware dependency filtering (JVM vs JS vs Native)
+> checkJvmDeps
+> checkJsDeps
+> checkNativeDeps

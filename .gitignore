@@ -16,6 +16,7 @@ tramp
 # LLMs
 CLAUDE.md
 .claude/
+.codex/
 .mcp.json
 # Logfiles and rotated logfiles.
 *.log

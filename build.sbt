@@ -65,9 +65,11 @@ lazy val root = project
     },
     Compile / doc := {
       val output = (Compile / doc).value
-      val assets = (ThisBuild / baseDirectory).value / "docs" / "_assets" / "images"
-      val favicon = assets / "favicon.ico"
+      val assetsDir = (ThisBuild / baseDirectory).value / "docs" / "_assets"
+      val favicon = assetsDir / "images" / "favicon.ico"
       if (favicon.exists()) IO.copyFile(favicon, output / "favicon.ico")
+      val customCss = assetsDir / "css" / "custom.css"
+      if (customCss.exists()) IO.copyFile(customCss, output / "styles" / "staticsitestyles.css")
       output
     }
   )

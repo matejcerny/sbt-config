@@ -2,6 +2,15 @@
   display: none;
 }
 
+.logo-container .project-logo {
+  max-width: 150px;
+}
+
+#dropdown-trigger {
+  position: relative;
+  top: 4px;
+}
+
 /* Base Admonition Styles */
 .admonition {
   padding: 1rem 1rem 1rem 1.25rem !important;
@@ -20,7 +29,7 @@
 }
 
 .admonition p {
-  margin-bottom: 0; /* Prevents awkward bottom spacing */
+  margin: 0;
 }
 
 /* -----------------------------------
@@ -43,13 +52,13 @@
    DARK THEME OVERRIDES
 ----------------------------------- */
 
-html[data-theme="dark"] .admonition.info {
+:root.theme-dark .admonition.info {
   background-color: #002b5e;
   border-color: #3399ff;
   color: #cce5ff;
 }
 
-html[data-theme="dark"] .admonition.warning {
+:root.theme-dark .admonition.warning {
   background-color: #4d2e00;
   border-color: #ffb74d;
   color: #ffe0b2;

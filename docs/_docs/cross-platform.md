@@ -1,7 +1,7 @@
 # Cross-Platform Dependencies
 
-<div class="admonition warning" style="padding: 1.25rem 1.5rem; display: block; margin-top: 1.5rem; border-left: 4px solid;">
-  <p style="margin: 0;">Cross-platform dependency support (Scala.js, Scala Native) is experimental. It may not work correctly and may change in future versions.</p>
+<div class="admonition warning">
+  <p>Cross-platform dependency support (Scala.js, Scala Native) is experimental. It may not work correctly and may change in future versions.</p>
 </div>
 
 For projects that target Scala.js or Scala Native, the plugin supports additional dependency keys and platform-aware filtering.

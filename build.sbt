@@ -70,6 +70,12 @@ lazy val root = project
       if (favicon.exists()) IO.copyFile(favicon, output / "favicon.ico")
       val customCss = assetsDir / "css" / "custom.css"
       if (customCss.exists()) IO.copyFile(customCss, output / "styles" / "staticsitestyles.css")
+      val hoconJs = assetsDir / "js" / "hljs-hocon.js"
+      val targetJs = output / "scripts" / "hljs-scala3.js"
+      if (hoconJs.exists() && targetJs.exists()) {
+        val existing = IO.read(targetJs)
+        IO.write(targetJs, existing + "\n" + IO.read(hoconJs))
+      }
       output
     }
   )

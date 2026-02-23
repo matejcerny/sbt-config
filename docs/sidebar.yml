@@ -1,0 +1,14 @@
+index: index.md
+subsection:
+  - page: index.md
+    title: Getting Started
+  - page: configuration.md
+    title: Configuration Reference
+  - page: dependencies.md
+    title: Dependencies
+  - page: publishing.md
+    title: Publishing Settings
+  - page: hocon.md
+    title: HOCON Features
+  - page: cross-platform.md
+    title: Cross-Platform Dependencies

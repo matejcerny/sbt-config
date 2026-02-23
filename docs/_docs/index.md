@@ -7,16 +7,16 @@ slug: /
 
 sbt-config is an sbt plugin that allows you to configure your Scala projects using HOCON configuration files instead of `build.sbt`.
 
-:::info Single-Module Support Only
-Currently, `sbt-config` is designed for **single-module projects**. Support for multi-module builds (defining distinct sub-projects and dependencies within a single `build.conf`) is not yet supported, but is planned for a future release.
-:::
+<div class="admonition info" style="padding: 1.25rem 1.5rem; display: block; margin-top: 1.5rem; border-left: 4px solid;">
+  <p style="margin: 0;">Currently, <code>sbt-config</code> is designed for <strong>single-module projects</strong>. Support for multi-module builds (defining distinct sub-projects and dependencies within a single `build.conf`) is not yet supported, but is planned for a future release.</p>
+</div>
 
 ## Installation
 
 Add the plugin to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("io.github.matejcerny" % "sbt-config" % "@VERSION@")
+addSbtPlugin("io.github.matejcerny" % "sbt-config" % "{{ projectVersion }}")
 ```
 
 ## Quick Start

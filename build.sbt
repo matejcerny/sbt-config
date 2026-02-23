@@ -47,20 +47,27 @@ lazy val root = project
         Seq("-Xfatal-warnings", "-Xlint", "-Ywarn-dead-code", "-Ywarn-numeric-widen", "-Ywarn-value-discard")
       else Seq("-Werror", "-Wconf:msg=deprecated for wildcard arguments:s")
     },
-    coverageExcludedFiles := ".*SbtConfigPlugin.*"
+    coverageExcludedFiles := ".*SbtConfigPlugin.*",
+    Compile / doc / scalacOptions ++= {
+      if (scalaBinaryVersion.value == "3")
+        Seq(
+          "-project", "sbt-config",
+          "-project-version", dynverGitDescribeOutput.value
+            .map(_.ref.dropPrefix)
+            .getOrElse(version.value),
+          "-siteroot", "docs",
+          "-social-links:github::https://github.com/matejcerny/sbt-config",
+          "-project-logo", "docs/_assets/images/logo.svg",
+          "-project-footer", "Copyright Matej Cerny",
+          "-versions-dictionary-url", "https://matejcerny.github.io/sbt-config/versions.json"
+        )
+      else Nil
+    },
+    Compile / doc := {
+      val output = (Compile / doc).value
+      val assets = (ThisBuild / baseDirectory).value / "docs" / "_assets" / "images"
+      val favicon = assets / "favicon.ico"
+      if (favicon.exists()) IO.copyFile(favicon, output / "favicon.ico")
+      output
+    }
   )
-
-lazy val docs = project
-  .in(file("sbt-config-docs"))
-  .enablePlugins(MdocPlugin, DocusaurusPlugin)
-  .settings(
-    moduleName := "sbt-config-docs",
-    crossScalaVersions := Seq("2.12.20"),
-    mdocVariables := Map(
-      "VERSION" -> dynverGitDescribeOutput.value
-        .map(_.ref.dropPrefix)
-        .getOrElse(version.value)
-    ),
-    publish / skip := true
-  )
-  .dependsOn(root)

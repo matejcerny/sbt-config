@@ -1,7 +1,3 @@
----
-sidebar_position: 4
----
-
 # Publishing Settings
 
 Configure your project for publishing to Maven Central using [sbt-ci-release](https://github.com/sbt/sbt-ci-release).

@@ -1,7 +1,3 @@
----
-sidebar_position: 3
----
-
 # Dependencies
 
 Dependencies are declared in a simple string format and automatically converted to sbt's `libraryDependencies`.

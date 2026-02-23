@@ -65,6 +65,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -77,4 +79,4 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Check documentation compiles
-        run: sbt docs/mdoc
+        run: sbt '++3.8.1; doc'

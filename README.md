@@ -3,6 +3,7 @@
 [![Latest version](https://maven-badges.sml.io/sonatype-central/io.github.matejcerny/sbt-config_2.12_1.0/badge.svg)](https://repo1.maven.org/maven2/io/github/matejcerny/sbt-config_2.12_1.0)
 [![Build Status](https://github.com/matejcerny/sbt-config/actions/workflows/ci.yml/badge.svg)](https://github.com/matejcerny/sbt-config/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/matejcerny/sbt-config/graph/badge.svg?token=MEBX8ZQXGD)](https://codecov.io/gh/matejcerny/sbt-config)
+![](https://img.shields.io/badge/2-ready-%232ca42c.svg?logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyNTcuMyIgaGVpZ2h0PSIxNDcuOCIgdmlld0JveD0iMCAwIDI1Ny4zIDE0Ny44Ij48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMTcgMTA2IDQgMTE4czcgOSAxNSAxMyAxNCA1IDIzIDVxMTUgMSAyNy05YzEyLTEwIDktOCA5LTE3IDAtNC0xLTEzLTYtMTgtNi03LTE1LTEwLTE1LTEwcy0yOC03LTI1LTE3cTMtNiAxNC01YzggMiAxNiA3IDE2IDdsMTItMTFzLTUtNy0xNC0xMXEtMTAtNC0xOS00Yy0xMyAwLTI5IDExLTMxIDIzcS0xIDE0IDggMjEgMTMgOSAxNCA4YzEtMSAyNSA2IDI1IDE0cy02IDExLTE2IDExLTI0LTEyLTI0LTEybTE4Mi02MXYxOWgxMHY1NHMyIDYgNyAxMGwxMiA4aDIxdi0xOWgtMTFzLTMgMC01LTJxLTQtNi0zLTdWNjRoMjBWNDVoLTIwVjEwaC0yMXYzNXptLTQyIDVxLTIxLTQtMzQgM2wxMS00My0yMS01LTMwIDEyMSAyMSA2IDMtMTFxOCAxNiAyNiAyMGMyNSA1IDQ3LTEyIDU0LTM5IDUtMjMtMTEtNDgtMzAtNTJtNiA2Ny0zMCA4LTIzLTIyIDgtMzEgMzAtOSAyMiAyM3oiLz48L3N2Zz4=)
 
 An sbt plugin that allows you to configure your Scala projects using HOCON configuration files instead of `build.sbt`.
 

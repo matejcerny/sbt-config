@@ -36,7 +36,7 @@ jobs:
         run: sbt +test
 
       - name: Run sbt 1.x scripted tests
-        run: sbt "scripted sbt-config/simple"
+        run: sbt "scripted sbt-config/simple" "scripted sbt-config/cross-project"
 
       - name: Run sbt 2.x scripted tests
         run: sbt "++3.8.1; scripted sbt-config/simple-sbt2"

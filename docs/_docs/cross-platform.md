@@ -8,7 +8,46 @@ For projects that target Scala.js or Scala Native, the plugin supports additiona
 
 ## Setup
 
-Cross-platform projects still require a `build.sbt` to enable platform plugins and define sub-projects — `build.conf` handles only the dependencies and metadata. A minimal setup for a JVM + Scala.js + Scala Native project:
+Cross-platform projects still require a `build.sbt` to enable platform plugins and define sub-projects — `build.conf` handles only the dependencies and metadata.
+
+### Using `crossProject` (recommended)
+
+The [`sbt-crossproject`](https://github.com/portable-scala/sbt-crossproject) plugin provides a `crossProject` DSL that manages shared and platform-specific source directories automatically. This is the recommended approach for real cross-compilation with shared source code.
+
+```scala
+// project/plugins.sbt
+addSbtPlugin("io.github.matejcerny" % "sbt-config" % "{{ projectVersion }}")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.10")
+addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
+```
+
+```scala
+// build.sbt
+lazy val root = crossProject(JVMPlatform, NativePlatform)
+  .crossType(CrossType.Full)
+  .settings(
+    sbtConfigFile := (ThisBuild / baseDirectory).value / "build.conf"
+  )
+```
+
+This gives you the standard `crossProject` directory layout:
+
+```
+shared/src/main/scala/   # shared sources compiled on all platforms
+jvm/src/main/scala/      # JVM-only sources
+native/src/main/scala/   # Native-only sources
+```
+
+For Scala.js, use `sbt-scalajs-crossproject` instead:
+
+```scala
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.2")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")
+```
+
+### Manual separate projects (alternative)
+
+If you don't need shared source code and only want platform-aware dependency filtering, you can define separate projects manually:
 
 ```scala
 // project/plugins.sbt
@@ -35,7 +74,7 @@ lazy val native = project.in(file("native"))
   .settings(commonSettings)
 ```
 
-All three sub-projects share the same `build.conf`; the plugin automatically detects each project's platform and filters dependencies accordingly.
+All sub-projects share the same `build.conf`; the plugin automatically detects each project's platform and filters dependencies accordingly.
 
 ## Language-Split Format
 

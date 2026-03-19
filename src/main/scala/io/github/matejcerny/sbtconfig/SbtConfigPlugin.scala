@@ -187,7 +187,10 @@ object SbtConfigPlugin extends AutoPlugin {
       case CrossVersionType.Java => dep.organization % dep.name % dep.version
       case CrossVersionType.ScalaJs | CrossVersionType.ScalaNative =>
         (dep.organization % dep.name % dep.version).cross(platformCV)
-      case _ => dep.organization %% dep.name % dep.version
+      case _ if dep.platform == Platform.Shared =>
+        (dep.organization % dep.name % dep.version).cross(platformCV)
+      case _ =>
+        dep.organization %% dep.name % dep.version
     }
 
   private def toDeveloper(dev: Developer): sbt.Developer =

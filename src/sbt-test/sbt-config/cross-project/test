@@ -1,0 +1,6 @@
+# Verify dependency filtering with crossProject
+> checkJvmDeps
+> checkNativeDeps
+
+# Verify actual compilation with shared source code
+> myProjectJVM/compile

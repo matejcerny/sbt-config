@@ -51,9 +51,7 @@ lazy val root = project
       if (scalaBinaryVersion.value == "3")
         Seq(
           "-project", "sbt-config",
-          "-project-version", dynverGitDescribeOutput.value
-            .map(_.ref.dropPrefix)
-            .getOrElse(version.value),
+          "-project-version", version.value,
           "-siteroot", "docs",
           "-social-links:github::https://github.com/matejcerny/sbt-config",
           "-project-logo", "docs/_assets/images/logo.svg",

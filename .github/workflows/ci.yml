@@ -39,7 +39,7 @@ jobs:
         run: sbt "scripted sbt-config/simple" "scripted sbt-config/cross-project"
 
       - name: Run sbt 2.x scripted tests
-        run: sbt "++3.8.1; scripted sbt-config/simple-sbt2"
+        run: sbt "++3.8.2; scripted sbt-config/simple-sbt2"
 
   scalafmt:
     runs-on: ubuntu-latest
@@ -79,4 +79,4 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Check documentation compiles
-        run: sbt '++3.8.1; doc'
+        run: sbt '++3.8.2; doc'

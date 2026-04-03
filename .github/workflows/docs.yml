@@ -29,7 +29,7 @@ jobs:
             echo "version=$(git describe --tags --abbrev=0 | sed 's/^v//')" >> "$GITHUB_OUTPUT"
           fi
 
-      - run: sbt '++3.8.1; doc'
+      - run: sbt '++3.8.2; doc'
 
       - name: Prepare site
         env:

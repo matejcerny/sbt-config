@@ -1,6 +1,7 @@
 {
   "versions": {
     "0.5.0": "https://matejcerny.github.io/sbt-config/0.5.0/docs/index.html",
-    "0.5.1": "https://matejcerny.github.io/sbt-config/0.5.1/docs/index.html"
+    "0.5.1": "https://matejcerny.github.io/sbt-config/0.5.1/docs/index.html",
+    "0.5.2": "https://matejcerny.github.io/sbt-config/0.5.2/docs/index.html"
   }
 }

@@ -2,7 +2,7 @@ package io.github.matejcerny.sbtconfig
 
 import io.github.matejcerny.sbtconfig.model._
 import io.github.matejcerny.sbtconfig.parser.ConfigParser
-import sbt.{ Developer => _, License => _, _ }
+import sbt.{ Developer => _, License => _, Resolver => _, _ }
 import sbt.Keys._
 import java.io.{ File, PrintWriter }
 import scala.util.Try
@@ -63,7 +63,10 @@ object SbtConfigPlugin extends AutoPlugin {
     developers ++= configValue(sbtConfigFile, _.developers).value
       .getOrElse(Seq.empty)
       .map(toDeveloper)
-      .toList
+      .toList,
+    resolvers ++= configValue(sbtConfigFile, _.resolvers).value
+      .getOrElse(Seq.empty)
+      .map(toResolver)
   )
 
   // Cache parsed configs by file path to avoid reparsing and duplicate warnings
@@ -143,6 +146,11 @@ object SbtConfigPlugin extends AutoPlugin {
          |#   "org.scalatest:scalatest:3.2.19"
          |# ]
          |
+         |# Resolvers (additional Maven repositories)
+         |# resolvers = [
+         |#   { name = "Sonatype Snapshots", url = "https://central.sonatype.com/repository/maven-snapshots/" }
+         |# ]
+         |
          |# Publishing settings (requires sbt-ci-release plugin)
          |# homepage = "${ProjectConfig.Example.homepage}"
          |# licenses = ["MIT"]  # Supported: $knownLicensesList
@@ -192,6 +200,9 @@ object SbtConfigPlugin extends AutoPlugin {
       case _ =>
         dep.organization %% dep.name % dep.version
     }
+
+  private def toResolver(r: model.Resolver): sbt.librarymanagement.MavenRepository =
+    sbt.librarymanagement.MavenRepository(r.name, r.url)
 
   private def toDeveloper(dev: Developer): sbt.Developer =
     sbt.Developer(

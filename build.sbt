@@ -1,8 +1,7 @@
 ThisBuild / organization := "io.github.matejcerny"
 ThisBuild / scalaVersion := "2.12.20"
-ThisBuild / crossScalaVersions := Seq("2.12.20", "3.8.1")
+ThisBuild / crossScalaVersions := Seq("2.12.20", "3.8.2")
 
-// Publishing settings for sbt-ci-release
 ThisBuild / homepage := Some(url("https://github.com/matejcerny/sbt-config"))
 ThisBuild / licenses := List("MIT" -> url("https://opensource.org/licenses/MIT"))
 ThisBuild / developers := List(
@@ -23,13 +22,13 @@ lazy val root = project
     sbtPlugin := true,
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
-        case "2.12" => "1.12.3"
-        case _      => "2.0.0-RC9"
+        case "2.12" => "1.12.8"
+        case _      => "2.0.0-RC10"
       }
     },
     libraryDependencies ++= Seq(
-      "com.typesafe" % "config" % "1.4.5" % Provided,
-      "org.scalatest" %% "scalatest" % "3.2.19" % Test
+      "com.typesafe" % "config" % "1.4.6" % Provided,
+      "org.scalatest" %% "scalatest" % "3.2.20" % Test
     ),
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++

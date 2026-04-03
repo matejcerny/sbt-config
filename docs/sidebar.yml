@@ -6,6 +6,8 @@ subsection:
     title: Configuration Reference
   - page: dependencies.md
     title: Dependencies
+  - page: resolvers.md
+    title: Resolvers
   - page: publishing.md
     title: Publishing Settings
   - page: hocon.md

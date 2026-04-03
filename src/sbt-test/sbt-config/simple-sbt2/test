@@ -13,6 +13,7 @@
 > checkLicenses
 > checkVersionScheme
 > checkDevelopers
+> checkResolvers
 
 # Verify project compiles (dependencies resolve correctly)
 > compile

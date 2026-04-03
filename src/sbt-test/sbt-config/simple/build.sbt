@@ -79,3 +79,9 @@ checkDevelopers := {
   assert(dev2.isDefined, "Expected developer with id 'dev2'")
   assert(dev2.get.name == "Developer Two", s"Expected name 'Developer Two', got '${dev2.get.name}'")
 }
+
+val checkResolvers = taskKey[Unit]("Check resolvers")
+checkResolvers := {
+  val names = resolvers.value.map(_.name)
+  assert(names.contains("Sonatype Snapshots"), s"Expected 'Sonatype Snapshots' in $names")
+}

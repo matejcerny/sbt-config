@@ -13,6 +13,7 @@ An sbt plugin that allows you to configure your Scala projects using HOCON confi
 - Set Scala version and compiler options
 - Declare dependencies in a simple `organization:artifact:version` format
 - Automatic cross-version handling for Scala dependencies
+- Add Maven resolvers for snapshot or private repositories
 - Publishing settings for sbt-ci-release (homepage, licenses, developers)
 - Creates a template `build.conf` if one doesn't exist
 - **sbt 1.x and 2.x support** via cross-built artifacts

@@ -51,8 +51,9 @@ object ConfigParser {
     val depsResult = DependencyParser.parseDependencyField(config, "dependencies")
     val testDepsResult = DependencyParser.parseDependencyField(config, "testDependencies")
     val developersResult = DeveloperParser.parseDevelopers(config)
+    val resolversResult = ResolverParser.parseResolvers(config)
 
-    val errors = Seq(depsResult, testDepsResult, developersResult).collect { case Left(e) => e }
+    val errors = Seq(depsResult, testDepsResult, developersResult, resolversResult).collect { case Left(e) => e }
 
     if (errors.nonEmpty) {
       Left(errors.mkString("; "))
@@ -69,7 +70,8 @@ object ConfigParser {
           homepage = getString(config, "homepage"),
           licenses = getStringList(config, "licenses"),
           versionScheme = getString(config, "versionScheme"),
-          developers = developersResult.toOption.flatten
+          developers = developersResult.toOption.flatten,
+          resolvers = resolversResult.toOption.flatten
         )
       )
     }

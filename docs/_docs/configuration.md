@@ -17,6 +17,7 @@ All configuration fields are optional. The plugin will use sbt defaults for any 
 | `licenses`         | Array[String]           | License identifiers (e.g., "MIT", "Apache2")                 |
 | `versionScheme`    | String                  | Version scheme (e.g., "early-semver", "semver-spec")         |
 | `developers`       | Array[Object]           | List of project developers                                   |
+| `resolvers`        | Array[Object]           | Additional Maven resolvers (see [Resolvers](./resolvers.md)) |
 
 ## Example
 
@@ -54,6 +55,13 @@ developers = [
     name = "John Doe"
     email = "john@example.com"
     url = "https://johndoe.dev"
+  }
+]
+
+resolvers = [
+  { 
+    name = "Sonatype Snapshots"
+    url = "https://central.sonatype.com/repository/maven-snapshots/"
   }
 ]
 ```

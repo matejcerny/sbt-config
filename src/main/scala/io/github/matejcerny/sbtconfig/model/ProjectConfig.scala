@@ -24,6 +24,8 @@ package io.github.matejcerny.sbtconfig.model
   *   Version scheme (e.g., "early-semver", "semver-spec")
   * @param developers
   *   List of project developers
+  * @param resolvers
+  *   List of additional Maven resolvers
   */
 case class ProjectConfig(
     name: Option[String] = None,
@@ -36,7 +38,8 @@ case class ProjectConfig(
     homepage: Option[String] = None,
     licenses: Option[Seq[String]] = None,
     versionScheme: Option[String] = None,
-    developers: Option[Seq[Developer]] = None
+    developers: Option[Seq[Developer]] = None,
+    resolvers: Option[Seq[Resolver]] = None
 )
 
 object ProjectConfig {
@@ -62,6 +65,9 @@ object ProjectConfig {
     val versionScheme = "early-semver"
     val developers: Seq[Developer] = Seq(
       Developer("johndoe", "John Doe", "john@example.com", "https://example.com")
+    )
+    val resolvers: Seq[Resolver] = Seq(
+      Resolver("Sonatype Snapshots", "https://central.sonatype.com/repository/maven-snapshots/")
     )
   }
 }

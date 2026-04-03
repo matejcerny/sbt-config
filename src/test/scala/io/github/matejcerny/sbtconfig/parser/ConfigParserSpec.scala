@@ -68,6 +68,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     projectConfig.scalacOptions shouldBe None
     projectConfig.dependencies shouldBe None
     projectConfig.testDependencies shouldBe None
+    projectConfig.resolvers shouldBe None
   }
 
   it should "parse an empty config" in {
@@ -123,6 +124,8 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     def depToString(d: Dependency): String = s""""${d.organization}:${d.name}:${d.version}""""
     def devToString(d: Developer): String =
       s"""{ id = "${d.id}", name = "${d.name}", email = "${d.email}", url = "${d.url}" }"""
+    def resolverToString(r: Resolver): String =
+      s"""{ name = "${r.name}", url = "${r.url}" }"""
     val config =
       s"""
         |name = "${Example.name}"
@@ -136,6 +139,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
         |licenses = ${Example.licenses.map(s => s""""$s"""").mkString("[", ", ", "]")}
         |versionScheme = "${Example.versionScheme}"
         |developers = ${Example.developers.map(devToString).mkString("[", ", ", "]")}
+        |resolvers = ${Example.resolvers.map(resolverToString).mkString("[", ", ", "]")}
         |""".stripMargin
 
     val result = ConfigParser.parse(config)
@@ -153,6 +157,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     projectConfig.licenses shouldBe Some(Example.licenses)
     projectConfig.versionScheme shouldBe Some(Example.versionScheme)
     projectConfig.developers shouldBe Some(Example.developers)
+    projectConfig.resolvers shouldBe Some(Example.resolvers)
   }
 
   it should "parse publishing settings" in {

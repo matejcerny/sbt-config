@@ -7,6 +7,9 @@ on:
 permissions:
   contents: write
 
+env:
+  SCALA_VERSION: 3.8.3
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -29,7 +32,7 @@ jobs:
             echo "version=$(git describe --tags --abbrev=0 | sed 's/^v//')" >> "$GITHUB_OUTPUT"
           fi
 
-      - run: sbt "set ThisBuild / version := \"$VERSION\"" '++3.8.2; doc'
+      - run: sbt "set ThisBuild / version := \"$VERSION\"" "++$SCALA_VERSION; doc"
         env:
           VERSION: ${{ steps.version.outputs.version }}
 
@@ -39,7 +42,7 @@ jobs:
           SITE_URL: https://matejcerny.github.io/sbt-config
         run: |
           mkdir -p "deploy/$VERSION"
-          cp -r target/scala-3.8.2/sbt-2/api/* "deploy/$VERSION/"
+          cp -r "target/scala-$SCALA_VERSION/sbt-2/api/"* "deploy/$VERSION/"
 
           curl -sf "$SITE_URL/versions.json" -o deploy/versions.json || echo '{"versions":{}}' > deploy/versions.json
           jq --arg ver "$VERSION" --arg url "$SITE_URL/$VERSION/docs/index.html" \

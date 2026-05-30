@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+env:
+  SCALA_VERSION: 3.8.3
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -31,7 +34,7 @@ jobs:
         run: sbt "scripted sbt-config/simple"
 
       - name: Run sbt 2.x scripted tests
-        run: sbt "++3.8.1; scripted sbt-config/simple-sbt2"
+        run: sbt "++$SCALA_VERSION; scripted sbt-config/simple-sbt2"
 
       - name: Publish to Sonatype Central
         run: sbt ci-release

@@ -27,7 +27,7 @@ lazy val root = project
       }
     },
     libraryDependencies ++= Seq(
-      "com.typesafe" % "config" % "1.4.6" % Provided,
+      "com.typesafe" % "config" % "1.4.8" % Provided,
       "org.scalatest" %% "scalatest" % "3.2.20" % Test
     ),
     scriptedLaunchOpts := {

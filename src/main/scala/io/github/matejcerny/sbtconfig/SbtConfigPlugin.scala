@@ -102,7 +102,7 @@ object SbtConfigPlugin extends AutoPlugin {
       val key = sbtConfigModule.value.orElse(ModuleResolver.resolveKey(id, bc.modules.keySet))
       key.flatMap(k => bc.modules.get(k).map(m => ModuleResolver.merge(bc.shared, m, k))) match {
         case some @ Some(_) => some
-        case None =>
+        case None           =>
           if (id != rootId && warnedUnlisted.add(id))
             System.err.println(s"[sbt-config] project `$id` is not configured by sbt-config — no `modules.$id` entry")
           None

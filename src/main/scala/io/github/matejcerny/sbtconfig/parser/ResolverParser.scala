@@ -14,7 +14,7 @@ object ResolverParser {
       Right(None)
     } else {
       Try(config.getConfigList("resolvers").asScala.toSeq) match {
-        case Failure(e) => Left(s"Failed to parse resolvers: ${e.getMessage}")
+        case Failure(e)               => Left(s"Failed to parse resolvers: ${e.getMessage}")
         case Success(resolverConfigs) =>
           val results = resolverConfigs.zipWithIndex.map { case (resolverConfig, idx) =>
             parseResolver(resolverConfig, idx)

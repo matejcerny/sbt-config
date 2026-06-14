@@ -2,22 +2,22 @@ package io.github.matejcerny.sbtconfig.parser
 
 import com.typesafe.config.{ Config, ConfigFactory }
 import io.github.matejcerny.sbtconfig.compat.CollectionConverters._
-import io.github.matejcerny.sbtconfig.model.ProjectConfig
+import io.github.matejcerny.sbtconfig.model.{ BuildConfig, ProjectConfig }
 import java.io.File
 import scala.io.Source
 import scala.util.{ Failure, Success, Try }
 
-/** Parser for HOCON configuration files. Converts Typesafe Config to ProjectConfig model. */
+/** Parser for HOCON configuration files. Converts Typesafe Config to the BuildConfig model. */
 object ConfigParser {
 
-  /** Parse a HOCON config file into ProjectConfig.
+  /** Parse a HOCON config file into BuildConfig.
     *
     * @param file
     *   The config file to parse
     * @return
-    *   Either an error message or the parsed ProjectConfig
+    *   Either an error message or the parsed BuildConfig
     */
-  def parse(file: File): Either[String, ProjectConfig] =
+  def parse(file: File): Either[String, BuildConfig] =
     if (!file.exists()) {
       Left(s"Config file not found: ${file.getAbsolutePath}")
     } else {
@@ -33,18 +33,48 @@ object ConfigParser {
       }
     }
 
-  /** Parse a HOCON config string into ProjectConfig.
+  /** Parse a HOCON config string into BuildConfig.
+    *
+    * Top-level fields are parsed as the shared config; an optional `modules { … }` object maps each module key to its
+    * own per-module config (parsed with the same logic). Errors from the shared parse and every module parse are
+    * collected into one `"; "`-joined message.
     *
     * @param content
     *   The HOCON config string to parse
     * @return
-    *   Either an error message or the parsed ProjectConfig
+    *   Either an error message or the parsed BuildConfig
     */
-  def parse(content: String): Either[String, ProjectConfig] =
+  def parse(content: String): Either[String, BuildConfig] =
     Try(ConfigFactory.parseString(content).resolve()) match {
-      case Success(config) => parseConfig(config)
+      case Success(config) => parseBuildConfig(config)
       case Failure(e)      => Left(s"Failed to parse config: ${e.getMessage}")
     }
+
+  /** Assemble a BuildConfig from a root Config: shared from the top level, modules from the `modules` object. */
+  private def parseBuildConfig(root: Config): Either[String, BuildConfig] = {
+    val sharedResult = parseConfig(root)
+
+    val moduleKeys: Seq[String] =
+      if (root.hasPath("modules")) root.getObject("modules").keySet().asScala.toSeq.sorted
+      else Seq.empty
+
+    val moduleResults: Seq[(String, Either[String, ProjectConfig])] =
+      moduleKeys.map(k => k -> parseConfig(root.getConfig("modules").getConfig(k)))
+
+    val errors =
+      (sharedResult :: moduleResults.map(_._2).toList).collect { case Left(e) => e }
+
+    if (errors.nonEmpty) {
+      Left(errors.mkString("; "))
+    } else {
+      Right(
+        BuildConfig(
+          shared = sharedResult.toOption.get,
+          modules = moduleResults.map { case (k, r) => k -> r.toOption.get }.toMap
+        )
+      )
+    }
+  }
 
   /** Parse a Typesafe Config object into ProjectConfig. Collects all errors instead of failing on the first one. */
   private def parseConfig(config: Config): Either[String, ProjectConfig] = {

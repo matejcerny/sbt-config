@@ -39,10 +39,10 @@ jobs:
         run: sbt +test
 
       - name: Run sbt 1.x scripted tests
-        run: sbt "scripted sbt-config/simple" "scripted sbt-config/cross-project"
+        run: sbt "scripted sbt-config/*"
 
       - name: Run sbt 2.x scripted tests
-        run: sbt "++$SCALA_VERSION; scripted sbt-config/simple-sbt2"
+        run: sbt "++$SCALA_VERSION; scripted sbt-config-sbt2/*"
 
   scalafmt:
     runs-on: ubuntu-latest

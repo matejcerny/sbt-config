@@ -1,0 +1,6 @@
+# Pins strip end-to-end: crossProject components bind to modules.core, filter per platform, share name = core.
+> checkJvmDeps
+> checkNativeDeps
+
+# Verify actual compilation with shared source code.
+> coreJVM/compile

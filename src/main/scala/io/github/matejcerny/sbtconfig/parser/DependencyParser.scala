@@ -14,8 +14,15 @@ import io.github.matejcerny.sbtconfig.model.{ CrossVersionType, Dependency, Plat
   */
 object DependencyParser {
 
+  // `jvm` block: Scala deps are JVM-only, so plain `%%`.
   private val languageKeys: Map[String, CrossVersionType] = Map(
     "scala" -> CrossVersionType.Scala,
+    "java" -> CrossVersionType.Java
+  )
+
+  // `shared` block: Scala deps must link on every targeted platform, so platform-adaptive `%%%`.
+  private val sharedLanguageKeys: Map[String, CrossVersionType] = Map(
+    "scala" -> CrossVersionType.ScalaPlatform,
     "java" -> CrossVersionType.Java
   )
 
@@ -94,8 +101,9 @@ object DependencyParser {
     } else {
       val platformResults = mode3PlatformKeys.toSeq.flatMap { key =>
         if (config.hasPath(key)) {
-          val platform = if (key == "shared") Platform.Shared else Platform.Jvm
-          Some(parsePlatformBlock(config, key, fieldName, platform))
+          val (platform, langKeys) =
+            if (key == "shared") (Platform.Shared, sharedLanguageKeys) else (Platform.Jvm, languageKeys)
+          Some(parsePlatformBlock(config, key, fieldName, platform, langKeys))
         } else {
           None
         }
@@ -112,26 +120,31 @@ object DependencyParser {
     }
   }
 
-  /** Parse a platform block (shared or jvm) that contains scala/java sub-keys. */
+  /** Parse a platform block (shared or jvm) that contains scala/java sub-keys.
+    *
+    * `langKeys` maps the allowed sub-keys to their cross-version type — it differs between the `shared` block (Scala →
+    * platform-adaptive `%%%`) and the `jvm` block (Scala → plain `%%`).
+    */
   private def parsePlatformBlock(
       config: Config,
       key: String,
       fieldName: String,
-      platform: Platform
+      platform: Platform,
+      langKeys: Map[String, CrossVersionType]
   ): Either[String, Option[Seq[Dependency]]] = {
     val blockPath = s"$fieldName.$key"
     config.getValue(key).valueType() match {
       case ConfigValueType.OBJECT =>
         val block = config.getConfig(key)
         val blockKeys = block.root().keySet().asScala.toSeq
-        val unknownKeys = blockKeys.filterNot(languageKeys.contains)
+        val unknownKeys = blockKeys.filterNot(langKeys.contains)
         if (unknownKeys.nonEmpty) {
           Left(
             s"Failed to parse $blockPath: unknown keys: ${unknownKeys.sorted.mkString(", ")}. " +
-              s"Allowed keys: ${languageKeys.keys.toSeq.sorted.mkString(", ")}"
+              s"Allowed keys: ${langKeys.keys.toSeq.sorted.mkString(", ")}"
           )
         } else {
-          val results = languageKeys.toSeq.flatMap { case (langKey, cvType) =>
+          val results = langKeys.toSeq.flatMap { case (langKey, cvType) =>
             if (block.hasPath(langKey))
               Some(
                 parseDependencyList(

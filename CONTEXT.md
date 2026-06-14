@@ -30,7 +30,8 @@ _Avoid_: module name, project name
 **Project id**:
 sbt's `thisProject.id` — the val name for a plain project (`skunk`), or val name + platform
 suffix for a `crossProject` component (`coreJVM`). Matching is on **id, never `name`**
-(the plugin *sets* `name`, so matching on name would be circular).
+(the plugin sets artifact identity through `moduleName`, and may also set `name`, so
+matching on name would be circular).
 
 **Single-project mode**:
 `build.conf` has no `modules` block. Top-level config applies to every project. Preserves

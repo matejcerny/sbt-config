@@ -1,0 +1,8 @@
+# The aggregator publish-skip heuristic must be conservative: skip only an aggregating build root.
+# A non-aggregating root and any non-root subproject must remain publishable.
+> checkRootPublishable
+> checkSubPublishable
+
+# Both projects still resolve and compile.
+> compile
+> sub/compile

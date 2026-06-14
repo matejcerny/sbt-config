@@ -4,6 +4,7 @@
 > checkSkunkDeps
 > checkAnalyticsExactFirst
 > checkUnlisted
+> checkRootSkipped
 
 # core resolves its (shared) dependencies and compiles.
 > core/compile

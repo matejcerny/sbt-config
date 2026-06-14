@@ -11,6 +11,12 @@ lazy val analyticsJS = project.in(file("analyticsjs"))
 // Unlisted project: no `modules.extras` entry → gets no shared config.
 lazy val extras = project.in(file("extras"))
 
+val checkRootSkipped = taskKey[Unit]("auto-generated aggregator root is skipped for publishing")
+checkRootSkipped := {
+  val skipped = (LocalRootProject / publish / skip).value
+  assert(skipped, "Expected LocalRootProject publish / skip to be true")
+}
+
 val checkCoreName = taskKey[Unit]("core name comes from the module key")
 checkCoreName := {
   val n = (core / name).value

@@ -30,6 +30,9 @@ object SbtConfigPlugin extends AutoPlugin {
     "The cross version used by %%% for platform-specific dependencies"
   )
 
+  private val sbtConfigSkipAggregatorPublish =
+    settingKey[Boolean]("Whether this project is the auto root aggregator and should not be published")
+
   override def globalSettings: Seq[Setting[_]] = Seq(
     platformDepsCrossVersion := CrossVersion.binary
   )
@@ -37,11 +40,17 @@ object SbtConfigPlugin extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     sbtConfigFile := (LocalRootProject / baseDirectory).value / "build.conf",
     sbtConfigModule := None,
-    sbtConfigPlatform := detectPlatform(platformDepsCrossVersion.value)
+    sbtConfigPlatform := detectPlatform(platformDepsCrossVersion.value),
+    sbtConfigSkipAggregatorPublish := {
+      val project = thisProject.value
+      project.id == (LocalRootProject / thisProject).value.id && project.aggregate.nonEmpty
+    },
+    publish / skip := sbtConfigSkipAggregatorPublish.value
   ) ++ configSettings
 
   private def configSettings: Seq[Setting[_]] = Seq(
     name := configValue(_.name).value.getOrElse(name.value),
+    moduleName := configValue(_.name).value.getOrElse(name.value),
     organization := configValue(_.organization).value.getOrElse(organization.value),
     version := configValue(_.version).value.getOrElse(version.value),
     scalaVersion := configValue(_.scalaVersion).value.getOrElse(scalaVersion.value),
@@ -152,14 +161,14 @@ object SbtConfigPlugin extends AutoPlugin {
          |
          |# Dependencies (format: "organization:artifact:version")
          |#
-         |# Flat list — all use Scala cross-versioning (%%), included in all projects
+         |# Flat list — Scala cross-versioning (%% on JVM, %%% on JS/Native), included in all projects
          |# dependencies = [
          |#   "org.typelevel:cats-core:2.13.0"
          |# ]
          |#
          |# Language split — scala/java shared everywhere, js/native only in platform projects
          |# dependencies {
-         |#   scala  = ["org.typelevel:cats-core:2.13.0"]   # %% (all projects)
+         |#   scala  = ["org.typelevel:cats-core:2.13.0"]   # %% on JVM, %%% on JS/Native (all projects)
          |#   java   = ["com.google.code.gson:gson:2.11.0"] # %  (all projects)
          |#   js     = ["org.scala-js:scalajs-dom:2.8.0"]   # %%% (Scala.js projects only)
          |#   native = ["com.armanbilge:epollcat:0.1.6"]     # %%% (Scala Native projects only)
@@ -229,12 +238,9 @@ object SbtConfigPlugin extends AutoPlugin {
   private def toModuleId(dep: Dependency, platformCV: CrossVersion): ModuleID =
     dep.crossVersionType match {
       case CrossVersionType.Java => dep.organization % dep.name % dep.version
-      // %%% — platform-suffixed on JS/Native, plain binary on JVM (platformCV adapts per project).
-      case CrossVersionType.ScalaJs | CrossVersionType.ScalaNative | CrossVersionType.ScalaPlatform =>
-        (dep.organization % dep.name % dep.version).cross(platformCV)
-      // %% — standard Scala binary cross-version, never platform-suffixed.
+      // .cross(platformCV): plain `%%` on JVM, platform-suffixed (`%%%`) on JS/Native (platformCV adapts per project).
       case CrossVersionType.Scala =>
-        dep.organization %% dep.name % dep.version
+        (dep.organization % dep.name % dep.version).cross(platformCV)
     }
 
   private def toResolver(r: model.Resolver): sbt.librarymanagement.MavenRepository =

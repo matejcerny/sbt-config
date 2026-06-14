@@ -14,29 +14,24 @@ import io.github.matejcerny.sbtconfig.model.{ CrossVersionType, Dependency, Plat
   */
 object DependencyParser {
 
-  // `jvm` block: Scala deps are JVM-only, so plain `%%`.
+  // `scala` adapts via `.cross(platformCV)` (plain `%%` on JVM, platform-suffixed on JS/Native); `java` is plain `%`.
+  // Used for both the `shared` and `jvm` blocks — the platform distinction is carried by `Platform`, not this map.
   private val languageKeys: Map[String, CrossVersionType] = Map(
     "scala" -> CrossVersionType.Scala,
-    "java" -> CrossVersionType.Java
-  )
-
-  // `shared` block: Scala deps must link on every targeted platform, so platform-adaptive `%%%`.
-  private val sharedLanguageKeys: Map[String, CrossVersionType] = Map(
-    "scala" -> CrossVersionType.ScalaPlatform,
     "java" -> CrossVersionType.Java
   )
 
   private val mode2Keys: Map[String, (CrossVersionType, Platform)] = Map(
     "scala" -> ((CrossVersionType.Scala, Platform.Shared)),
     "java" -> ((CrossVersionType.Java, Platform.Shared)),
-    "js" -> ((CrossVersionType.ScalaJs, Platform.Js)),
-    "native" -> ((CrossVersionType.ScalaNative, Platform.Native))
+    "js" -> ((CrossVersionType.Scala, Platform.Js)),
+    "native" -> ((CrossVersionType.Scala, Platform.Native))
   )
 
   private val mode3PlatformKeys: Set[String] = Set("shared", "jvm")
   private val mode3FlatKeys: Map[String, (CrossVersionType, Platform)] = Map(
-    "js" -> ((CrossVersionType.ScalaJs, Platform.Js)),
-    "native" -> ((CrossVersionType.ScalaNative, Platform.Native))
+    "js" -> ((CrossVersionType.Scala, Platform.Js)),
+    "native" -> ((CrossVersionType.Scala, Platform.Native))
   )
   private val mode3AllKeys: Set[String] = mode3PlatformKeys ++ mode3FlatKeys.keySet
 
@@ -54,10 +49,8 @@ object DependencyParser {
         case ConfigValueType.OBJECT =>
           val nested = config.getConfig(fieldName)
           val keys = nested.root().keySet().asScala.toSet
-          if (keys.exists(mode3PlatformKeys.contains))
-            parseFullMatrix(nested, fieldName)
-          else
-            parseLanguageSplit(nested, fieldName)
+          if (keys.exists(mode3PlatformKeys.contains)) parseFullMatrix(nested, fieldName)
+          else parseLanguageSplit(nested, fieldName)
         case other =>
           Left(s"Failed to parse $fieldName: expected a list or object, got ${other.name.toLowerCase}")
       }
@@ -101,9 +94,8 @@ object DependencyParser {
     } else {
       val platformResults = mode3PlatformKeys.toSeq.flatMap { key =>
         if (config.hasPath(key)) {
-          val (platform, langKeys) =
-            if (key == "shared") (Platform.Shared, sharedLanguageKeys) else (Platform.Jvm, languageKeys)
-          Some(parsePlatformBlock(config, key, fieldName, platform, langKeys))
+          val platform = if (key == "shared") Platform.Shared else Platform.Jvm
+          Some(parsePlatformBlock(config, key, fieldName, platform, languageKeys))
         } else {
           None
         }
@@ -122,8 +114,9 @@ object DependencyParser {
 
   /** Parse a platform block (shared or jvm) that contains scala/java sub-keys.
     *
-    * `langKeys` maps the allowed sub-keys to their cross-version type — it differs between the `shared` block (Scala →
-    * platform-adaptive `%%%`) and the `jvm` block (Scala → plain `%%`).
+    * `langKeys` maps the allowed sub-keys to their cross-version type. The shared-vs-jvm distinction is carried by the
+    * `platform` argument, not this map: a `scala` dep is always `CrossVersionType.Scala` and adapts via
+    * `.cross(platformCV)` at apply-time.
     */
   private def parsePlatformBlock(
       config: Config,

@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
 
 ## Dependency Types
 
-By default, all dependencies use Scala cross-versioning (`%%`). To declare Java dependencies, use the nested object format:
+By default, all dependencies use Scala cross-versioning — `%%` on the JVM, and platform-suffixed (`%%%`) automatically in Scala.js / Scala Native projects. To declare Java dependencies, use the nested object format:
 
 ```hocon
 dependencies {
@@ -37,10 +37,10 @@ All keys are optional — include only the ones you need.
 
 ### Key Mapping
 
-| Key     | sbt Operator | Description                            |
-|---------|--------------|----------------------------------------|
-| `scala` | `%%`         | Standard Scala cross-versioned library |
-| `java`  | `%`          | Plain Java library (no cross-version)  |
+| Key     | sbt Operator | Description                                                                 |
+|---------|--------------|-----------------------------------------------------------------------------|
+| `scala` | `%%` / `%%%` | Scala cross-versioned library (`%%` on JVM, platform-suffixed on JS/Native) |
+| `java`  | `%`          | Plain Java library (no cross-version)                                       |
 
 ### Flat vs Nested
 

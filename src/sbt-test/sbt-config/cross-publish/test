@@ -1,0 +1,4 @@
+# Cross components publish under build.conf name; auto root aggregator does not publish.
+> checkModuleNames
+> checkRootSkipped
+> publishLocal

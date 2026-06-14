@@ -25,10 +25,11 @@ addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
 // build.sbt
 lazy val root = crossProject(JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
-  .settings(
-    sbtConfigFile := (ThisBuild / baseDirectory).value / "build.conf"
-  )
 ```
+
+By default, the plugin reads `build.conf` from the build root, so every platform sub-project picks it up automatically. Override `sbtConfigFile` only if your `build.conf` lives elsewhere.
+
+If `build.conf` defines `name`, that value is used as the published artifact's `moduleName` for every platform component, regardless of the `crossProject` val name. The auto-generated root project that only aggregates those components is skipped during publishing, so it does not produce an empty aggregate artifact.
 
 This gives you the standard `crossProject` directory layout:
 
@@ -58,20 +59,13 @@ addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.10")
 
 ```scala
 // build.sbt
-val commonSettings = Seq(
-  sbtConfigFile := (ThisBuild / baseDirectory).value / "build.conf"
-)
-
 lazy val jvm = project.in(file("jvm"))
-  .settings(commonSettings)
 
 lazy val js = project.in(file("js"))
   .enablePlugins(ScalaJSPlugin)
-  .settings(commonSettings)
 
 lazy val native = project.in(file("native"))
   .enablePlugins(ScalaNativePlugin)
-  .settings(commonSettings)
 ```
 
 All sub-projects share the same `build.conf`; the plugin automatically detects each project's platform and filters dependencies accordingly.
@@ -91,14 +85,14 @@ dependencies {
 
 ### Key Mapping
 
-| Key      | sbt Operator | Description                                              |
-|----------|--------------|----------------------------------------------------------|
-| `scala`  | `%%`         | Standard Scala cross-versioned library                   |
-| `java`   | `%`          | Plain Java library (no cross-version)                    |
-| `js`     | `%%%`        | Scala.js library (requires sbt-scalajs plugin)           |
-| `native` | `%%%`        | Scala Native library (requires sbt-scala-native plugin)  |
+| Key      | sbt Operator | Description                                                        |
+|----------|--------------|--------------------------------------------------------------------|
+| `scala`  | `%%` / `%%%` | Shared Scala library (`%%` on JVM, platform-suffixed on JS/Native) |
+| `java`   | `%`          | Plain Java library (no cross-version)                              |
+| `js`     | `%%%`        | Scala.js library (requires sbt-scalajs plugin)                     |
+| `native` | `%%%`        | Scala Native library (requires sbt-scala-native plugin)            |
 
-In this format, `scala` and `java` dependencies are treated as shared (included in all platforms), while `js` and `native` are platform-specific.
+The real distinction between `scala` and `js`/`native` here is **scope**, not operator: `scala` (and `java`) deps are shared — included in every platform — while `js`/`native` deps are platform-specific. All Scala deps adapt their cross-version automatically via the active platform plugin, so a shared `scala` dep resolves as `%%` on the JVM and `%%%` in a Scala.js / Scala Native project.
 
 ## Full Matrix Format
 
@@ -125,11 +119,11 @@ The `shared` and `jvm` blocks are objects containing `scala` and/or `java` keys.
 Dependencies are automatically filtered based on the active platform. The plugin auto-detects which platform a project targets by inspecting the cross-version set by sbt-scalajs or sbt-scala-native:
 
 | Block    | JVM project | Scala.js project | Scala Native project |
-|----------|:-----------:|:-----------------:|:--------------------:|
-| `shared` | included    | included          | included             |
-| `jvm`    | included    | excluded          | excluded             |
-| `js`     | excluded    | included          | excluded             |
-| `native` | excluded    | excluded          | included             |
+|----------|:-----------:|:----------------:|:--------------------:|
+| `shared` |  included   |     included     |       included       |
+| `jvm`    |  included   |     excluded     |       excluded       |
+| `js`     |  excluded   |     included     |       excluded       |
+| `native` |  excluded   |     excluded     |       included       |
 
 ### Overriding Platform Detection
 

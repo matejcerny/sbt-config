@@ -1,5 +1,9 @@
 # Multi-Module
 
+<div class="admonition warning">
+  <p>Multi-module support is experimental. It may not work correctly and may change in future versions.</p>
+</div>
+
 A single root `build.conf` can configure a whole multi-module build: shared settings at the top level plus per-module overrides in a `modules { … }` block. You keep the project topology (`project`/`crossProject`, `dependsOn`, `aggregate`) in a thin `build.sbt`; the plugin owns the configuration.
 
 ## Single-project vs. multi-module mode
@@ -54,13 +58,13 @@ lazy val analytics = project
 
 When a project binds to a module, its shared and module settings are merged:
 
-| Field group | Fields | Rule |
-|-------------|--------|------|
-| Scalars | `organization`, `version`, `scalaVersion`, `versionScheme`, `homepage` | module value overrides shared (`module orElse shared`) |
-| Lists | `dependencies`, `testDependencies`, `scalacOptions`, `resolvers`, `developers`, `licenses` | appended (`shared ++ module`); deduplication is left to sbt/coursier |
-| `name` | `name` | the module's `name`, or the **module key** — never inherited from the top level |
+| Field group   | Fields                                                                                     | Rule                                                                            |
+|---------------|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| Scalars       | `organization`, `version`, `scalaVersion`, `versionScheme`, `homepage`                     | module value overrides shared (`module orElse shared`)                          |
+| Lists         | `dependencies`, `testDependencies`, `scalacOptions`, `resolvers`, `developers`, `licenses` | appended (`shared ++ module`); deduplication is left to sbt/coursier            |
+| `name`        | `name`, `moduleName`                                                                       | the module's `name`, or the **module key** - never inherited from the top level |
 
-Because `name` defaults to the module key, a `crossProject` whose components are `coreJVM`/`coreNative` both get `name = "core"`, producing correct artifact names. A top-level `name` alongside a `modules` block binds to nothing and is ignored with a one-time warning.
+Because `moduleName` is driven by that resolved module name, a `crossProject` whose components are `coreJVM`/`coreNative` both publish as `core` artifacts even if the crossproject plugin pins each component's sbt `name` to its project id. A root project that only aggregates subprojects is skipped during publishing, so it does not produce an empty aggregate artifact. A top-level `name` alongside a `modules` block binds to nothing and is ignored with a one-time warning.
 
 There is no per-module *removal* of an inherited list element — if a value shouldn't be everywhere, don't put it at the top level.
 
@@ -80,7 +84,7 @@ modules {
 }
 ```
 
-## Topology stays in `build.sbt`
+## Topology stays in build.sbt
 
 `dependsOn` and `aggregate` are part of a project's **definition**, not settings, and the platform-qualified target (`core.jvm` vs `core`) can't be expressed in HOCON. They therefore live in `build.sbt`:
 

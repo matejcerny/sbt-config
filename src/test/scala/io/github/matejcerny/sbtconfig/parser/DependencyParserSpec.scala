@@ -97,9 +97,9 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     deps should have size 4
     deps should contain(Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala, Platform.Shared))
     deps should contain(Dependency("com.google.code.gson", "gson", "2.11.0", CrossVersionType.Java, Platform.Shared))
-    deps should contain(Dependency("org.scala-js", "scalajs-dom", "2.8.0", CrossVersionType.ScalaJs, Platform.Js))
+    deps should contain(Dependency("org.scala-js", "scalajs-dom", "2.8.0", CrossVersionType.Scala, Platform.Js))
     deps should contain(
-      Dependency("com.armanbilge", "epollcat", "0.1.6", CrossVersionType.ScalaNative, Platform.Native)
+      Dependency("com.armanbilge", "epollcat", "0.1.6", CrossVersionType.Scala, Platform.Native)
     )
   }
 
@@ -242,14 +242,14 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val deps = result.value.shared.dependencies.get
     deps should have size 6
     deps should contain(
-      Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.ScalaPlatform, Platform.Shared)
+      Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala, Platform.Shared)
     )
     deps should contain(Dependency("org.slf4j", "slf4j-api", "2.0.16", CrossVersionType.Java, Platform.Shared))
     deps should contain(Dependency("org.typelevel", "cats-effect", "3.5.0", CrossVersionType.Scala, Platform.Jvm))
     deps should contain(Dependency("com.google.code.gson", "gson", "2.11.0", CrossVersionType.Java, Platform.Jvm))
-    deps should contain(Dependency("org.scala-js", "scalajs-dom", "2.8.0", CrossVersionType.ScalaJs, Platform.Js))
+    deps should contain(Dependency("org.scala-js", "scalajs-dom", "2.8.0", CrossVersionType.Scala, Platform.Js))
     deps should contain(
-      Dependency("com.armanbilge", "epollcat", "0.1.6", CrossVersionType.ScalaNative, Platform.Native)
+      Dependency("com.armanbilge", "epollcat", "0.1.6", CrossVersionType.Scala, Platform.Native)
     )
   }
 
@@ -270,9 +270,9 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val deps = result.value.shared.dependencies.get
     deps should have size 2
     deps should contain(
-      Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.ScalaPlatform, Platform.Shared)
+      Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala, Platform.Shared)
     )
-    deps should contain(Dependency("org.scala-js", "scalajs-dom", "2.8.0", CrossVersionType.ScalaJs, Platform.Js))
+    deps should contain(Dependency("org.scala-js", "scalajs-dom", "2.8.0", CrossVersionType.Scala, Platform.Js))
   }
 
   it should "parse full matrix with only jvm block" in {
@@ -410,7 +410,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val deps = result.value.shared.testDependencies.get
     deps should have size 2
     deps should contain(
-      Dependency("org.scalatest", "scalatest", "3.2.19", CrossVersionType.ScalaPlatform, Platform.Shared)
+      Dependency("org.scalatest", "scalatest", "3.2.19", CrossVersionType.Scala, Platform.Shared)
     )
     deps should contain(Dependency("junit", "junit", "4.13.2", CrossVersionType.Java, Platform.Jvm))
   }

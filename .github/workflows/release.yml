@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 env:
-  SCALA_VERSION: 3.8.3
+  SCALA_VERSION: 3.8.4
 
 jobs:
   publish:

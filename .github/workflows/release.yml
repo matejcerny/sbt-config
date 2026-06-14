@@ -34,7 +34,7 @@ jobs:
         run: sbt "scripted sbt-config/simple"
 
       - name: Run sbt 2.x scripted tests
-        run: sbt "++$SCALA_VERSION; scripted sbt-config/simple-sbt2"
+        run: sbt "++$SCALA_VERSION; scripted sbt-config-sbt2/simple-sbt2"
 
       - name: Publish to Sonatype Central
         run: sbt ci-release

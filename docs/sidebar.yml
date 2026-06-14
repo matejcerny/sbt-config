@@ -14,3 +14,5 @@ subsection:
     title: HOCON Features
   - page: cross-platform.md
     title: Cross-Platform Dependencies
+  - page: multi-module.md
+    title: Multi-Module

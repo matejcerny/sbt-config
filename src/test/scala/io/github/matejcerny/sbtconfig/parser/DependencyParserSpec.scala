@@ -54,7 +54,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    result.value.dependencies shouldBe Some(
+    result.value.shared.dependencies shouldBe Some(
       Seq(
         Dependency("org.typelevel", "cats-core", "2.13.0")
       )
@@ -72,7 +72,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val deps = result.value.dependencies.get
+    val deps = result.value.shared.dependencies.get
     deps should have size 1
     deps.head shouldBe Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala, Platform.Shared)
   }
@@ -93,7 +93,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val deps = result.value.dependencies.get
+    val deps = result.value.shared.dependencies.get
     deps should have size 4
     deps should contain(Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala, Platform.Shared))
     deps should contain(Dependency("com.google.code.gson", "gson", "2.11.0", CrossVersionType.Java, Platform.Shared))
@@ -115,7 +115,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val deps = result.value.dependencies.get
+    val deps = result.value.shared.dependencies.get
     deps should have size 2
     deps should contain(Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala, Platform.Shared))
     deps should contain(Dependency("com.google.code.gson", "gson", "2.11.0", CrossVersionType.Java, Platform.Shared))
@@ -133,7 +133,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val deps = result.value.testDependencies.get
+    val deps = result.value.shared.testDependencies.get
     deps should have size 2
     deps should contain(Dependency("org.scalatest", "scalatest", "3.2.19", CrossVersionType.Scala, Platform.Shared))
     deps should contain(Dependency("junit", "junit", "4.13.2", CrossVersionType.Java, Platform.Shared))
@@ -152,10 +152,10 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    result.value.dependencies shouldBe Some(
+    result.value.shared.dependencies shouldBe Some(
       Seq(Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala))
     )
-    val testDeps = result.value.testDependencies.get
+    val testDeps = result.value.shared.testDependencies.get
     testDeps should have size 2
     testDeps should contain(Dependency("org.scalatest", "scalatest", "3.2.19", CrossVersionType.Scala, Platform.Shared))
     testDeps should contain(Dependency("junit", "junit", "4.13.2", CrossVersionType.Java, Platform.Shared))
@@ -170,7 +170,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    result.value.dependencies shouldBe None
+    result.value.shared.dependencies shouldBe None
   }
 
   it should "return error for unknown keys in nested dependencies" in {
@@ -239,9 +239,11 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val deps = result.value.dependencies.get
+    val deps = result.value.shared.dependencies.get
     deps should have size 6
-    deps should contain(Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala, Platform.Shared))
+    deps should contain(
+      Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.ScalaPlatform, Platform.Shared)
+    )
     deps should contain(Dependency("org.slf4j", "slf4j-api", "2.0.16", CrossVersionType.Java, Platform.Shared))
     deps should contain(Dependency("org.typelevel", "cats-effect", "3.5.0", CrossVersionType.Scala, Platform.Jvm))
     deps should contain(Dependency("com.google.code.gson", "gson", "2.11.0", CrossVersionType.Java, Platform.Jvm))
@@ -265,9 +267,11 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val deps = result.value.dependencies.get
+    val deps = result.value.shared.dependencies.get
     deps should have size 2
-    deps should contain(Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala, Platform.Shared))
+    deps should contain(
+      Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.ScalaPlatform, Platform.Shared)
+    )
     deps should contain(Dependency("org.scala-js", "scalajs-dom", "2.8.0", CrossVersionType.ScalaJs, Platform.Js))
   }
 
@@ -284,7 +288,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val deps = result.value.dependencies.get
+    val deps = result.value.shared.dependencies.get
     deps should have size 1
     deps.head shouldBe Dependency("com.google.code.gson", "gson", "2.11.0", CrossVersionType.Java, Platform.Jvm)
   }
@@ -301,7 +305,7 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    result.value.dependencies shouldBe None
+    result.value.shared.dependencies shouldBe None
   }
 
   it should "return error for unknown keys in full matrix" in {
@@ -403,9 +407,11 @@ class DependencyParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val deps = result.value.testDependencies.get
+    val deps = result.value.shared.testDependencies.get
     deps should have size 2
-    deps should contain(Dependency("org.scalatest", "scalatest", "3.2.19", CrossVersionType.Scala, Platform.Shared))
+    deps should contain(
+      Dependency("org.scalatest", "scalatest", "3.2.19", CrossVersionType.ScalaPlatform, Platform.Shared)
+    )
     deps should contain(Dependency("junit", "junit", "4.13.2", CrossVersionType.Java, Platform.Jvm))
   }
 }

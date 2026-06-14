@@ -31,7 +31,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val projectConfig = result.value
+    val projectConfig = result.value.shared
     projectConfig.name shouldBe Some("my-project")
     projectConfig.organization shouldBe Some("com.example")
     projectConfig.version shouldBe Some("1.0.0")
@@ -60,7 +60,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val projectConfig = result.value
+    val projectConfig = result.value.shared
     projectConfig.name shouldBe Some("minimal-project")
     projectConfig.organization shouldBe None
     projectConfig.version shouldBe None
@@ -75,7 +75,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse("")
 
     result.isRight shouldBe true
-    result.value shouldBe ProjectConfig.empty
+    result.value.shared shouldBe ProjectConfig.empty
   }
 
   it should "return error for invalid HOCON syntax" in {
@@ -117,7 +117,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    result.value.version shouldBe Some("1.0.0-SNAPSHOT")
+    result.value.shared.version shouldBe Some("1.0.0-SNAPSHOT")
   }
 
   it should "parse config matching Example values" in {
@@ -145,7 +145,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val projectConfig = result.value
+    val projectConfig = result.value.shared
     projectConfig.name shouldBe Some(Example.name)
     projectConfig.organization shouldBe Some(Example.organization)
     projectConfig.version shouldBe Some(Example.version)
@@ -175,7 +175,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(config)
 
     result.isRight shouldBe true
-    val projectConfig = result.value
+    val projectConfig = result.value.shared
     projectConfig.homepage shouldBe Some("https://github.com/example/project")
     projectConfig.licenses shouldBe Some(Seq("MIT", "Apache2"))
     projectConfig.versionScheme shouldBe Some("early-semver")
@@ -201,8 +201,8 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     val result = ConfigParser.parse(tempFile)
 
     result.isRight shouldBe true
-    result.value.name shouldBe Some(Example.name)
-    result.value.scalaVersion shouldBe Some(Example.scalaVersion)
+    result.value.shared.name shouldBe Some(Example.name)
+    result.value.shared.scalaVersion shouldBe Some(Example.scalaVersion)
   }
 
   it should "return error for non-existent file" in {
@@ -221,5 +221,75 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
 
     result.isLeft shouldBe true
     result.left.value should include("Failed to read config file")
+  }
+
+  "ConfigParser.parse multi-module" should "produce an empty modules map for a single-project file" in {
+    val config =
+      """
+        |name = "single"
+        |scalaVersion = "3.3.4"
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isRight shouldBe true
+    result.value.modules shouldBe empty
+    result.value.shared.name shouldBe Some("single")
+  }
+
+  it should "produce an empty modules map for an empty `modules {}` block" in {
+    val config =
+      """
+        |scalaVersion = "3.3.4"
+        |modules {}
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isRight shouldBe true
+    result.value.modules shouldBe empty
+    result.value.shared.scalaVersion shouldBe Some("3.3.4")
+  }
+
+  it should "parse a populated modules block with shared fields intact" in {
+    val config =
+      """
+        |scalaVersion = "3.3.4"
+        |dependencies = ["org.typelevel:cats-core:2.13.0"]
+        |
+        |modules {
+        |  core {}
+        |  skunk {
+        |    dependencies = ["org.tpolecat:skunk-core:0.6.4"]
+        |  }
+        |}
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isRight shouldBe true
+    val bc = result.value
+    bc.shared.scalaVersion shouldBe Some("3.3.4")
+    bc.shared.dependencies shouldBe Some(Seq(Dependency("org.typelevel", "cats-core", "2.13.0")))
+    bc.modules.keySet shouldBe Set("core", "skunk")
+    bc.modules("core") shouldBe ProjectConfig.empty
+    bc.modules("skunk").dependencies shouldBe Some(Seq(Dependency("org.tpolecat", "skunk-core", "0.6.4")))
+  }
+
+  it should "return a Left when a module contains a malformed dependency" in {
+    val config =
+      """
+        |scalaVersion = "3.3.4"
+        |modules {
+        |  core {
+        |    dependencies = ["invalid-dep"]
+        |  }
+        |}
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isLeft shouldBe true
+    result.left.value should include("invalid-dep")
   }
 }

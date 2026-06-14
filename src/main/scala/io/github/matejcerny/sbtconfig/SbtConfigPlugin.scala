@@ -15,6 +15,8 @@ object SbtConfigPlugin extends AutoPlugin {
     val sbtConfigFile = settingKey[File]("The HOCON configuration file (default: build.conf)")
     val sbtConfigPlatform =
       settingKey[Platform]("The platform of the current project (auto-detected from platform plugins)")
+    val sbtConfigModule =
+      settingKey[Option[String]]("Override the module key this project binds to (default: derived from project id)")
     val Platform = model.Platform
   }
 
@@ -33,62 +35,92 @@ object SbtConfigPlugin extends AutoPlugin {
   )
 
   override def projectSettings: Seq[Setting[_]] = Seq(
-    sbtConfigFile := baseDirectory.value / "build.conf",
+    sbtConfigFile := (LocalRootProject / baseDirectory).value / "build.conf",
+    sbtConfigModule := None,
     sbtConfigPlatform := detectPlatform(platformDepsCrossVersion.value)
   ) ++ configSettings
 
   private def configSettings: Seq[Setting[_]] = Seq(
-    name := configValue(sbtConfigFile, _.name).value.getOrElse(name.value),
-    organization := configValue(sbtConfigFile, _.organization).value.getOrElse(organization.value),
-    version := configValue(sbtConfigFile, _.version).value.getOrElse(version.value),
-    scalaVersion := configValue(sbtConfigFile, _.scalaVersion).value.getOrElse(scalaVersion.value),
-    scalacOptions ++= configValue(sbtConfigFile, _.scalacOptions).value.getOrElse(Seq.empty),
+    name := configValue(_.name).value.getOrElse(name.value),
+    organization := configValue(_.organization).value.getOrElse(organization.value),
+    version := configValue(_.version).value.getOrElse(version.value),
+    scalaVersion := configValue(_.scalaVersion).value.getOrElse(scalaVersion.value),
+    scalacOptions ++= configValue(_.scalacOptions).value.getOrElse(Seq.empty),
     libraryDependencies ++= {
-      val deps = configValue(sbtConfigFile, _.dependencies).value.getOrElse(Seq.empty)
+      val deps = configValue(_.dependencies).value.getOrElse(Seq.empty)
       val platform = sbtConfigPlatform.value
       val platformCV = platformDepsCrossVersion.value
       filterDeps(deps, platform).map(toModuleId(_, platformCV))
     },
     libraryDependencies ++= {
-      val deps = configValue(sbtConfigFile, _.testDependencies).value.getOrElse(Seq.empty)
+      val deps = configValue(_.testDependencies).value.getOrElse(Seq.empty)
       val platform = sbtConfigPlatform.value
       val platformCV = platformDepsCrossVersion.value
       filterDeps(deps, platform).map(toModuleId(_, platformCV) % Test)
     },
-    homepage := configValue(sbtConfigFile, _.homepage).value.map(url) orElse homepage.value,
-    licenses ++= configValue(sbtConfigFile, _.licenses).value
+    homepage := configValue(_.homepage).value.map(url) orElse homepage.value,
+    licenses ++= configValue(_.licenses).value
       .getOrElse(Seq.empty)
       .flatMap(License.toLicense),
-    versionScheme := configValue(sbtConfigFile, _.versionScheme).value orElse versionScheme.value,
-    developers ++= configValue(sbtConfigFile, _.developers).value
+    versionScheme := configValue(_.versionScheme).value orElse versionScheme.value,
+    developers ++= configValue(_.developers).value
       .getOrElse(Seq.empty)
       .map(toDeveloper)
       .toList,
-    resolvers ++= configValue(sbtConfigFile, _.resolvers).value
+    resolvers ++= configValue(_.resolvers).value
       .getOrElse(Seq.empty)
       .map(toResolver)
   )
 
-  // Cache parsed configs by file path to avoid reparsing and duplicate warnings
-  private val configCache = scala.collection.mutable.Map[String, Option[ProjectConfig]]()
+  // Cache parsed BuildConfigs to avoid reparsing and duplicate per-file diagnostics within a resolution pass.
+  // Keyed by file path *and* its modification signature (lastModified, length) so that a reload after the file
+  // changes reparses instead of returning a stale config — e.g. a now-malformed file must abort, not silently
+  // keep the previously-loaded settings.
+  private val configCache = scala.collection.mutable.Map[(String, Long, Long), BuildConfig]()
 
-  private def configValue[A](
-      fileKey: SettingKey[File],
-      extract: ProjectConfig => Option[A]
-  ): Def.Initialize[Option[A]] = Def.setting {
-    val file = fileKey.value
+  // Per-id de-dup for the unlisted-project warning (the file-keyed cache can't dedup this — all projects share one file).
+  private val warnedUnlisted = scala.collection.mutable.Set[String]()
+
+  // Extract a single field from the resolved config. Field-typed (not Option[ProjectConfig]) so the consuming
+  // setting's cache inputs stay hashable on sbt 2; resolvedConfig is composed in, never exposed via `.value` directly.
+  private def configValue[A](extract: ProjectConfig => Option[A]): Def.Initialize[Option[A]] =
+    Def.setting(resolvedConfig.value.flatMap(extract))
+
+  // Resolve the config that applies to the current project, on top of the cached BuildConfig.
+  // Single-project mode (no modules) -> shared applies to everyone. Multi-module mode -> merge shared + the matched
+  // module, or None (with a one-time warning) when the project's id is not listed. Not cached: it varies per project id.
+  private def resolvedConfig: Def.Initialize[Option[ProjectConfig]] = Def.setting {
+    val file = sbtConfigFile.value
     ensureConfigFileExists(file)
-    loadConfig(file).flatMap(extract)
+    val bc = loadConfig(file)
+    val id = thisProject.value.id
+    val rootId = (LocalRootProject / thisProject).value.id
+
+    if (bc.modules.isEmpty) {
+      Some(bc.shared)
+    } else {
+      val key = sbtConfigModule.value.orElse(ModuleResolver.resolveKey(id, bc.modules.keySet))
+      key.flatMap(k => bc.modules.get(k).map(m => ModuleResolver.merge(bc.shared, m, k))) match {
+        case some @ Some(_) => some
+        case None =>
+          if (id != rootId && warnedUnlisted.add(id))
+            System.err.println(s"[sbt-config] project `$id` is not configured by sbt-config — no `modules.$id` entry")
+          None
+      }
+    }
   }
 
-  private def loadConfig(file: File): Option[ProjectConfig] =
+  private def loadConfig(file: File): BuildConfig =
     configCache.getOrElseUpdate(
-      file.getAbsolutePath,
+      (file.getAbsolutePath, file.lastModified(), file.length()),
       ConfigParser.parse(file) match {
-        case Right(config) => Some(config)
-        case Left(error) =>
-          System.err.println(s"[sbt-config] $error")
-          None
+        case Right(cfg) =>
+          if (cfg.shared.name.isDefined && cfg.modules.nonEmpty)
+            System.err.println(
+              "[sbt-config] top-level `name` is ignored in multi-module mode (modules derive their name from the module key)"
+            )
+          cfg
+        case Left(error) => throw new MessageOnlyException(s"[sbt-config] $error")
       }
     )
 
@@ -102,6 +134,10 @@ object SbtConfigPlugin extends AutoPlugin {
     val content =
       s"""# sbt-config: HOCON configuration for sbt projects
          |# Documentation: https://matejcerny.github.io/sbt-config/
+         |
+         |# Multi-module builds: add a `modules` block (top-level settings become shared).
+         |# See https://matejcerny.github.io/sbt-config/ — section "Multi-Module".
+         |# Cross-compilation: see section "Cross-Platform Dependencies".
          |
          |# name = "${ProjectConfig.Example.name}"
          |# organization = "${ProjectConfig.Example.organization}"
@@ -193,11 +229,11 @@ object SbtConfigPlugin extends AutoPlugin {
   private def toModuleId(dep: Dependency, platformCV: CrossVersion): ModuleID =
     dep.crossVersionType match {
       case CrossVersionType.Java => dep.organization % dep.name % dep.version
-      case CrossVersionType.ScalaJs | CrossVersionType.ScalaNative =>
+      // %%% — platform-suffixed on JS/Native, plain binary on JVM (platformCV adapts per project).
+      case CrossVersionType.ScalaJs | CrossVersionType.ScalaNative | CrossVersionType.ScalaPlatform =>
         (dep.organization % dep.name % dep.version).cross(platformCV)
-      case _ if dep.platform == Platform.Shared =>
-        (dep.organization % dep.name % dep.version).cross(platformCV)
-      case _ =>
+      // %% — standard Scala binary cross-version, never platform-suffixed.
+      case CrossVersionType.Scala =>
         dep.organization %% dep.name % dep.version
     }
 

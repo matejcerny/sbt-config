@@ -1,0 +1,9 @@
+# Multi-module wiring: shared + per-module merge, exact-first binding, unlisted isolation.
+> checkCoreName
+> checkCoreDeps
+> checkSkunkDeps
+> checkAnalyticsExactFirst
+> checkUnlisted
+
+# core resolves its (shared) dependencies and compiles.
+> core/compile

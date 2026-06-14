@@ -1,0 +1,8 @@
+# A present-but-malformed build.conf must abort the load (D8), not silently degrade to defaults.
+
+# Sanity: a valid config loads.
+> reload
+
+# Swap in the malformed config; reload is expected to FAIL.
+$ copy-file changes/build.conf build.conf
+-> reload

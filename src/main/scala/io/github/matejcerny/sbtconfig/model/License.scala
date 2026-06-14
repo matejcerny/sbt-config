@@ -11,7 +11,7 @@ object License {
     case "MIT"     => Some(sbt.librarymanagement.License.MIT)
     case "CC0"     => Some(sbt.librarymanagement.License.CC0)
     case "GPL3"    => Some(sbt.librarymanagement.License.GPL3_or_later)
-    case _ =>
+    case _         =>
       System.err.println(
         s"[sbt-config] Unknown license: '$licenseId'. Supported: ${supported.mkString(", ")}"
       )

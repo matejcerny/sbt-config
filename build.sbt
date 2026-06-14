@@ -1,6 +1,6 @@
 ThisBuild / organization := "io.github.matejcerny"
 ThisBuild / scalaVersion := "2.12.21"
-ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.3")
+ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.4")
 
 ThisBuild / homepage := Some(url("https://github.com/matejcerny/sbt-config"))
 ThisBuild / licenses := List("MIT" -> url("https://opensource.org/licenses/MIT"))
@@ -27,7 +27,7 @@ lazy val root = project
       }
     },
     libraryDependencies ++= Seq(
-      "com.typesafe" % "config" % "1.4.8" % Provided,
+      "com.typesafe" % "config" % "1.4.9" % Provided,
       "org.scalatest" %% "scalatest" % "3.2.20" % Test
     ),
     scriptedLaunchOpts := {

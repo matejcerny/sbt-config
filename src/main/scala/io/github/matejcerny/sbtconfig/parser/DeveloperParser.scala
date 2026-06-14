@@ -14,7 +14,7 @@ object DeveloperParser {
       Right(None)
     } else {
       Try(config.getConfigList("developers").asScala.toSeq) match {
-        case Failure(e) => Left(s"Failed to parse developers: ${e.getMessage}")
+        case Failure(e)          => Left(s"Failed to parse developers: ${e.getMessage}")
         case Success(devConfigs) =>
           val results = devConfigs.zipWithIndex.map { case (devConfig, idx) =>
             parseDeveloper(devConfig, idx)

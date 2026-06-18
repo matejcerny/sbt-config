@@ -22,8 +22,8 @@ lazy val root = project
     sbtPlugin := true,
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
-        case "2.12" => "1.12.8"
-        case _      => "2.0.0-RC10"
+        case "2.12" => "1.12.12"
+        case _      => "2.0.0"
       }
     },
     libraryDependencies ++= Seq(

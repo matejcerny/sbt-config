@@ -1,0 +1,125 @@
+<!DOCTYPE html><html data-pathToRoot="../" data-rawLocation="docs/multi-module" data-dynamicSideMenu="false"><head><meta charset="utf-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta><title>Multi-Module</title><link rel="shortcut icon" type="image/x-icon" href="../favicon.ico"></link><script type="text/javascript" src="../scripts/theme.js"></script><script type="text/javascript" src="../scripts/searchData.js" defer="true"></script><script type="text/javascript" src="../scripts/scastieConfiguration.js" defer="true"></script><link rel="stylesheet" href="../styles/theme/bundle.css"></link><link rel="stylesheet" href="../styles/theme/components/bundle.css"></link><link rel="stylesheet" href="../styles/theme/components/button/bundle.css"></link><link rel="stylesheet" href="../styles/theme/layout/bundle.css"></link><link rel="stylesheet" href="../styles/nord-light.css"></link><link rel="stylesheet" href="../styles/dotty-icons.css"></link><link rel="stylesheet" href="../styles/filter-bar.css"></link><link rel="stylesheet" href="../styles/code-snippets.css"></link><link rel="stylesheet" href="../styles/searchbar.css"></link><link rel="stylesheet" href="../styles/social-links.css"></link><link rel="stylesheet" href="../styles/versions-dropdown.css"></link><link rel="stylesheet" href="../styles/content-contributors.css"></link><link rel="stylesheet" href="../styles/fontawesome.css"></link><script type="text/javascript" src="../hljs/highlight.pack.js" defer="true"></script><script type="text/javascript" src="../scripts/hljs-scala3.js" defer="true"></script><script type="text/javascript" src="../scripts/ux.js" defer="true"></script><script type="text/javascript" src="../scripts/common/component.js" defer="true"></script><script type="text/javascript" src="../scripts/common/utils.js" defer="true"></script><script type="text/javascript" src="../scripts/components/FilterBar.js" defer="true"></script><script type="text/javascript" src="../scripts/components/DocumentableList.js" defer="true"></script><script type="text/javascript" src="../scripts/components/Input.js" defer="true"></script><script type="text/javascript" src="../scripts/components/FilterGroup.js" defer="true"></script><script type="text/javascript" src="../scripts/components/Filter.js" defer="true"></script><script type="text/javascript" src="../scripts/scaladoc-scalajs.js" defer="true"></script><script type="text/javascript" src="../scripts/contributors.js" defer="true"></script><script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js" defer="true"></script><script type="text/javascript" src="https://d3js.org/d3.v6.min.js" defer="true"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/graphlib-dot@0.6.2/dist/graphlib-dot.min.js" defer="true"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.1/dagre-d3.min.js" defer="true"></script><script type="text/javascript" src="https://scastie.scala-lang.org/embedded.js" defer="true"></script><script type="text/javascript" src="../scripts/data.js" defer="true"></script><link rel="stylesheet" href="../styles/staticsitestyles.css"></link><script>var pathToRoot = "../";</script><script>var versionsDictionaryUrl = "https://matejcerny.github.io/sbt-config/versions.json";</script></head><body><div id=""><div id="header" class="body-small"><div class="header-container-left"><a href="../" class="logo-container"><span id="project-logo" class="project-logo"><img src="../project-logo/logo.svg"></img></span><span id="dark-project-logo" class="project-logo"><img src="../project-logo/logo_dark.svg"></img></span><span class="project-name h300">sbt-config</span></a><span onclick="dropdownHandler(event)" class="text-button with-arrow" id="dropdown-trigger"><a><div class="projectVersion">0.6.0</div></a></span><div id="version-dropdown" class="dropdown-menu"></div></div><div class="header-container-right"><button id="search-toggle" class="icon-button"></button><span id="theme-toggle" class="icon-button"></span><span id="mobile-menu-toggle" class="icon-button hamburger"></span></div></div><div id="mobile-menu"><div class="mobile-menu-header body-small"><span class="mobile-menu-logo"><span id="project-logo" class="project-logo"><img src="../project-logo/logo.svg"></img></span><span id="dark-project-logo" class="project-logo"><img src="../project-logo/logo_dark.svg"></img></span><span class="project-name h300">sbt-config</span></span><button id="mobile-menu-close" class="icon-button close"></button></div><div class="mobile-menu-container body-medium"><input id="mobile-scaladoc-searchbar-input" class="scaladoc-searchbar-input" type="search" placeholder="Find anything"></input><span id="mobile-theme-toggle" class="mobile-menu-item mode"></span></div></div><span id="mobile-sidebar-toggle" class="floating-button"></span><div id="leftColumn" class="body-small"><div class="switcher-container"><a id="docs-nav-button" class="switcher h100 selected" href="index.html">Docs</a><a id="api-nav-button" class="switcher h100 " href="../index.html">API</a></div><nav id="docs-nav" class="side-menu"><div class="ni n0 "><span class="nh de"><a href="index.html"><span>Getting Started</span></a></span></div><div class="ni n0 "><span class="nh de"><a href="configuration.html"><span>Configuration Reference</span></a></span></div><div class="ni n0 "><span class="nh de"><a href="dependencies.html"><span>Dependencies</span></a></span></div><div class="ni n0 "><span class="nh de"><a href="resolvers.html"><span>Resolvers</span></a></span></div><div class="ni n0 "><span class="nh de"><a href="publishing.html"><span>Publishing Settings</span></a></span></div><div class="ni n0 "><span class="nh de"><a href="hocon.html"><span>HOCON Features</span></a></span></div><div class="ni n0 "><span class="nh de"><a href="cross-platform.html"><span>Cross-Platform Dependencies</span></a></span></div><div class="ni n0 expanded"><span class="nh h100 selected de"><a href="#"><span>Multi-Module</span></a></span></div></nav></div><div id="footer" class="body-small"><div class="left-container">Generated with</div><div class="right-container"><a href="https://github.com/matejcerny/sbt-config"><button class="icon-button gh"></button></a><div class="text">Copyright Matej Cerny</div></div><div class="text-mobile">Copyright Matej Cerny</div></div><div id="scaladoc-searchBar"></div><div id="main"><div class="breadcrumbs container"><a href="index.html">sbt-config</a>/<a href="multi-module.html">Multi-Module</a></div><div id="content" class="body-medium"><div><section id="multi-module">
+ <h1 class="h500"><a href="#multi-module" class="anchor"></a>Multi-Module</h1>
+ <div class="admonition warning">
+  <p>Multi-module support is experimental. It may not work correctly and may change in future versions.</p>
+ </div>
+ <p>A single root <code>build.conf</code> can configure a whole multi-module build: shared settings at the top level plus per-module overrides in a <code>modules { … }</code> block. You keep the project topology (<code>project</code>/<code>crossProject</code>, <code>dependsOn</code>, <code>aggregate</code>) in a thin <code>build.sbt</code>; the plugin owns the configuration.</p>
+</section>
+<section id="single-project-vs-multi-module-mode">
+ <h2 class="h500"><a href="#single-project-vs-multi-module-mode" class="anchor"></a>Single-project vs. multi-module mode</h2>
+ <p>The mode is decided by whether the parsed <code>modules</code> block contains <strong>at least one key</strong>:</p>
+ <ul>
+  <li><strong>No <code>modules</code> block</strong> (or an empty <code>modules {}</code>) → <strong>single-project mode</strong>: the top-level settings apply to every project in the build. This is the original behavior and is unchanged.</li>
+  <li><strong>One or more <code>modules.&lt;key&gt;</code> entries</strong> → <strong>multi-module mode</strong>: the top-level settings become <strong>shared</strong>, and each project gets the shared settings merged with the matching module's overrides. Projects opt in by being listed.</li>
+ </ul>
+</section>
+<section id="shared-vs-module-settings">
+ <h2 class="h500"><a href="#shared-vs-module-settings" class="anchor"></a>Shared vs. module settings</h2>
+ <div class="snippet mono-small-block">
+  <pre><code class="language-hocon"><span line-number="1" class=""><span class="tooltip-container"></span># build.conf
+</span><span line-number="2" class=""><span class="tooltip-container"></span>scalaVersion = "3.3.4"
+</span><span line-number="3" class=""><span class="tooltip-container"></span>dependencies = ["org.typelevel:cats-core:2.13.0"]   # shared across all listed modules
+</span><span line-number="4" class=""><span class="tooltip-container"></span>
+</span><span line-number="5" class=""><span class="tooltip-container"></span>modules {
+</span><span line-number="6" class=""><span class="tooltip-container"></span>  core {}                                             # only shared settings — listed empty to opt in
+</span><span line-number="7" class=""><span class="tooltip-container"></span>  skunk {
+</span><span line-number="8" class=""><span class="tooltip-container"></span>    dependencies = ["org.tpolecat:skunk-core:0.6.4"] # shared ++ module
+</span><span line-number="9" class=""><span class="tooltip-container"></span>  }
+</span><span line-number="10" class=""><span class="tooltip-container"></span>}
+</span></code></pre>
+  <div class="buttons"></div>
+ </div>
+ <div class="snippet mono-small-block" scala-snippet="">
+  <pre><code class="language-scala"><span line-number="1" class=""><span class="tooltip-container"></span>// build.sbt — topology only
+</span><span line-number="2" class=""><span class="tooltip-container"></span>lazy val core  = project.in(file("core"))
+</span><span line-number="3" class=""><span class="tooltip-container"></span>lazy val skunk = project.in(file("modules/skunk")).dependsOn(core)
+</span></code></pre>
+  <div class="buttons"></div>
+ </div>
+</section>
+<section id="binding-a-project-to-a-module">
+ <h2 class="h500"><a href="#binding-a-project-to-a-module" class="anchor"></a>Binding a project to a module</h2>
+ <p>A project's configuration is found by matching its <strong>id</strong> (the <code>val</code> name in <code>build.sbt</code>) against the keys in <code>modules</code>:</p>
+ <ol>
+  <li><strong>Exact match</strong> wins: a project with id <code>skunk</code> binds to <code>modules.skunk</code>.</li>
+  <li>Otherwise the plugin <strong>strips a trailing platform suffix</strong> (<code>JVM</code>, <code>JS</code>, or <code>Native</code>) and tries again — so the <code>crossProject</code> components <code>coreJVM</code> / <code>coreJS</code> / <code>coreNative</code> all bind to <code>modules.core</code>.</li>
+  <li>No match → the project gets <strong>no configuration</strong> (and a one-time warning, except for the root/aggregator project).</li>
+ </ol>
+ <p>The strip is <strong>case-sensitive</strong>, matching the exact casing <code>sbt-crossproject</code> emits. A plain project like <code>mathjs</code> (lowercase <code>js</code>) is never stripped, and a plain project whose id ends in a capitalized token (e.g. <code>analyticsJS</code>) binds to <code>modules.analyticsJS</code> directly via the exact-first rule — no override needed.</p>
+</section>
+<section id="overriding-the-binding">
+ <h3 class="h400"><a href="#overriding-the-binding" class="anchor"></a>Overriding the binding</h3>
+ <p>For the rare case where a project's id doesn't match its intended key, set <code>sbtConfigModule</code> on the project. When set, it is used as the module key directly (exact lookup, bypassing the strip):</p>
+ <div class="snippet mono-small-block" scala-snippet="">
+  <pre><code class="language-scala"><span line-number="1" class=""><span class="tooltip-container"></span>lazy val analytics = project
+</span><span line-number="2" class=""><span class="tooltip-container"></span>  .in(file("analytics"))
+</span><span line-number="3" class=""><span class="tooltip-container"></span>  .settings(sbtConfigModule := Some("analyticsJS"))
+</span></code></pre>
+  <div class="buttons"></div>
+ </div>
+</section>
+<section id="merge-semantics">
+ <h2 class="h500"><a href="#merge-semantics" class="anchor"></a>Merge semantics</h2>
+ <p>When a project binds to a module, its shared and module settings are merged:</p>
+ <table>
+  <thead>
+   <tr>
+    <th>Field group</th>
+    <th>Fields</th>
+    <th>Rule</th>
+   </tr>
+  </thead>
+  <tbody>
+   <tr>
+    <td>Scalars</td>
+    <td><code>organization</code>, <code>version</code>, <code>scalaVersion</code>, <code>versionScheme</code>, <code>homepage</code></td>
+    <td>module value overrides shared (<code>module orElse shared</code>)</td>
+   </tr>
+   <tr>
+    <td>Lists</td>
+    <td><code>dependencies</code>, <code>testDependencies</code>, <code>scalacOptions</code>, <code>resolvers</code>, <code>developers</code>, <code>licenses</code></td>
+    <td>appended (<code>shared ++ module</code>); deduplication is left to sbt/coursier</td>
+   </tr>
+   <tr>
+    <td><code>name</code></td>
+    <td><code>name</code>, <code>moduleName</code></td>
+    <td>the module's <code>name</code>, or the <strong>module key</strong> - never inherited from the top level</td>
+   </tr>
+  </tbody>
+ </table>
+ <p>Because <code>moduleName</code> is driven by that resolved module name, a <code>crossProject</code> whose components are <code>coreJVM</code>/<code>coreNative</code> both publish as <code>core</code> artifacts even if the crossproject plugin pins each component's sbt <code>name</code> to its project id. A root project that only aggregates subprojects is skipped during publishing, so it does not produce an empty aggregate artifact. A top-level <code>name</code> alongside a <code>modules</code> block binds to nothing and is ignored with a one-time warning.</p>
+ <p>There is no per-module <em>removal</em> of an inherited list element — if a value shouldn't be everywhere, don't put it at the top level.</p>
+</section>
+<section id="cross-platform-modules">
+ <h2 class="h500"><a href="#cross-platform-modules" class="anchor"></a>Cross-platform modules</h2>
+ <p>Cross-compilation works exactly as in single-project mode (see <a href="cross-platform.html">Cross-Platform Dependencies</a>). Write the <code>crossProject</code> macro in <code>build.sbt</code>; the plugin detects each component's platform and filters its dependencies. The nested <code>shared</code>/<code>jvm</code>/<code>js</code>/<code>native</code> dependency syntax is available inside each <code>modules.&lt;key&gt;</code> block:</p>
+ <div class="snippet mono-small-block">
+  <pre><code class="language-hocon"><span line-number="1" class=""><span class="tooltip-container"></span>modules {
+</span><span line-number="2" class=""><span class="tooltip-container"></span>  core {
+</span><span line-number="3" class=""><span class="tooltip-container"></span>    dependencies {
+</span><span line-number="4" class=""><span class="tooltip-container"></span>      shared { scala = ["org.typelevel:cats-core:2.13.0"] }
+</span><span line-number="5" class=""><span class="tooltip-container"></span>      jvm    { java  = ["com.google.code.gson:gson:2.11.0"] }
+</span><span line-number="6" class=""><span class="tooltip-container"></span>      native = ["com.armanbilge:epollcat:0.1.6"]
+</span><span line-number="7" class=""><span class="tooltip-container"></span>    }
+</span><span line-number="8" class=""><span class="tooltip-container"></span>  }
+</span><span line-number="9" class=""><span class="tooltip-container"></span>}
+</span></code></pre>
+  <div class="buttons"></div>
+ </div>
+</section>
+<section id="topology-stays-in-buildsbt">
+ <h2 class="h500"><a href="#topology-stays-in-buildsbt" class="anchor"></a>Topology stays in build.sbt</h2>
+ <p><code>dependsOn</code> and <code>aggregate</code> are part of a project's <strong>definition</strong>, not settings, and the platform-qualified target (<code>core.jvm</code> vs <code>core</code>) can't be expressed in HOCON. They therefore live in <code>build.sbt</code>:</p>
+ <div class="snippet mono-small-block" scala-snippet="">
+  <pre><code class="language-scala"><span line-number="1" class=""><span class="tooltip-container"></span>lazy val core  = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Full).in(file("core"))
+</span><span line-number="2" class=""><span class="tooltip-container"></span>lazy val skunk = project.in(file("modules/skunk")).dependsOn(core.jvm)
+</span><span line-number="3" class=""><span class="tooltip-container"></span>lazy val root  = project.in(file(".")).aggregate(core.jvm, core.native, skunk)
+</span></code></pre>
+  <div class="buttons"></div>
+ </div>
+ <p>Any sbt setting that HOCON can't express goes directly on the project definition in <code>build.sbt</code>.</p>
+</section>
+<section id="malformed-configuration-aborts-the-load">
+ <h2 class="h500"><a href="#malformed-configuration-aborts-the-load" class="anchor"></a>Malformed configuration aborts the load</h2>
+ <p>A missing <code>build.conf</code> is created as a commented stub (single-project mode, no behavior change). A <strong>present-but-malformed</strong> file — a parse error or an invalid dependency string, at the top level or inside any module — <strong>aborts the build load</strong> with a single <code>[sbt-config]</code> error rather than silently degrading to defaults.</p>
+</section></div><div id="toc" class="body-small"><div id="toc-container"><span class="toc-title h200">In this article</span><nav class="toc-nav"><ul class="toc-list"><li><a href="#multi-module">Multi-Module</a><ul><li><a href="#single-project-vs-multi-module-mode">Single-project vs. multi-module mode</a></li><li><a href="#shared-vs-module-settings">Shared vs. module settings</a></li><li><a href="#binding-a-project-to-a-module">Binding a project to a module</a><ul><li><a href="#overriding-the-binding">Overriding the binding</a></li></ul></li><li><a href="#merge-semantics">Merge semantics</a></li><li><a href="#cross-platform-modules">Cross-platform modules</a></li><li><a href="#topology-stays-in-buildsbt">Topology stays in build.sbt</a></li><li><a href="#malformed-configuration-aborts-the-load">Malformed configuration aborts the load</a></li></ul></li></ul></nav></div></div></div><div id="footer" class="body-small mobile-footer"><div class="left-container">Generated with</div><div class="right-container"><a href="https://github.com/matejcerny/sbt-config"><button class="icon-button gh"></button></a><div class="text">Copyright Matej Cerny</div></div><div class="text-mobile">Copyright Matej Cerny</div></div></div></div></body></html>

@@ -26,6 +26,9 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
         |testDependencies = [
         |  "org.scalatest:scalatest:3.2.19"
         |]
+        |providedDependencies = [
+        |  "com.typesafe:config:1.4.9"
+        |]
         |""".stripMargin
 
     val result = ConfigParser.parse(config)
@@ -48,6 +51,31 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
         Dependency("org.scalatest", "scalatest", "3.2.19")
       )
     )
+    projectConfig.providedDependencies shouldBe Some(
+      Seq(
+        Dependency("com.typesafe", "config", "1.4.9")
+      )
+    )
+  }
+
+  it should "parse providedDependencies in the nested object format" in {
+    val config =
+      """
+        |providedDependencies {
+        |  scala = ["org.typelevel:cats-core:2.13.0"]
+        |  java  = ["com.typesafe:config:1.4.9"]
+        |}
+        |""".stripMargin
+
+    val result = ConfigParser.parse(config)
+
+    result.isRight shouldBe true
+    result.value.shared.providedDependencies shouldBe Some(
+      Seq(
+        Dependency("org.typelevel", "cats-core", "2.13.0", CrossVersionType.Scala),
+        Dependency("com.typesafe", "config", "1.4.9", CrossVersionType.Java)
+      )
+    )
   }
 
   it should "parse a minimal config with only some fields" in {
@@ -68,6 +96,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
     projectConfig.scalacOptions shouldBe None
     projectConfig.dependencies shouldBe None
     projectConfig.testDependencies shouldBe None
+    projectConfig.providedDependencies shouldBe None
     projectConfig.resolvers shouldBe None
   }
 

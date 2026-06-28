@@ -16,6 +16,8 @@ package io.github.matejcerny.sbtconfig.model
   *   Compile dependencies
   * @param testDependencies
   *   Test dependencies
+  * @param providedDependencies
+  *   Provided dependencies (compile-time only, not packaged/published)
   * @param homepage
   *   Project homepage URL
   * @param licenses
@@ -35,6 +37,7 @@ case class ProjectConfig(
     scalacOptions: Option[Seq[String]] = None,
     dependencies: Option[Seq[Dependency]] = None,
     testDependencies: Option[Seq[Dependency]] = None,
+    providedDependencies: Option[Seq[Dependency]] = None,
     homepage: Option[String] = None,
     licenses: Option[Seq[String]] = None,
     versionScheme: Option[String] = None,
@@ -59,6 +62,9 @@ object ProjectConfig {
     )
     val testDependencies: Seq[Dependency] = Seq(
       Dependency("org.scalatest", "scalatest", "3.2.19")
+    )
+    val providedDependencies: Seq[Dependency] = Seq(
+      Dependency("com.typesafe", "config", "1.4.9", CrossVersionType.Java)
     )
     val homepage = "https://github.com/example/example-project"
     val licenses: Seq[String] = Seq("MIT")

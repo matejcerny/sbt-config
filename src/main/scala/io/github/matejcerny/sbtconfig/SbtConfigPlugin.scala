@@ -67,6 +67,12 @@ object SbtConfigPlugin extends AutoPlugin {
       val platformCV = platformDepsCrossVersion.value
       filterDeps(deps, platform).map(toModuleId(_, platformCV) % Test)
     },
+    libraryDependencies ++= {
+      val deps = configValue(_.providedDependencies).value.getOrElse(Seq.empty)
+      val platform = sbtConfigPlatform.value
+      val platformCV = platformDepsCrossVersion.value
+      filterDeps(deps, platform).map(toModuleId(_, platformCV) % Provided)
+    },
     homepage := configValue(_.homepage).value.map(url) orElse homepage.value,
     licenses ++= configValue(_.licenses).value
       .getOrElse(Seq.empty)
@@ -189,6 +195,11 @@ object SbtConfigPlugin extends AutoPlugin {
          |# Test dependencies (automatically added with Test scope)
          |# testDependencies = [
          |#   "org.scalatest:scalatest:3.2.19"
+         |# ]
+         |
+         |# Provided dependencies (compile-time only, not packaged/published)
+         |# providedDependencies = [
+         |#   "com.typesafe:config:1.4.9"
          |# ]
          |
          |# Resolvers (additional Maven repositories)

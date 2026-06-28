@@ -80,10 +80,14 @@ object ConfigParser {
   private def parseConfig(config: Config): Either[String, ProjectConfig] = {
     val depsResult = DependencyParser.parseDependencyField(config, "dependencies")
     val testDepsResult = DependencyParser.parseDependencyField(config, "testDependencies")
+    val providedDepsResult = DependencyParser.parseDependencyField(config, "providedDependencies")
     val developersResult = DeveloperParser.parseDevelopers(config)
     val resolversResult = ResolverParser.parseResolvers(config)
 
-    val errors = Seq(depsResult, testDepsResult, developersResult, resolversResult).collect { case Left(e) => e }
+    val errors =
+      Seq(depsResult, testDepsResult, providedDepsResult, developersResult, resolversResult).collect { case Left(e) =>
+        e
+      }
 
     if (errors.nonEmpty) {
       Left(errors.mkString("; "))
@@ -97,6 +101,7 @@ object ConfigParser {
           scalacOptions = getStringList(config, "scalacOptions"),
           dependencies = depsResult.toOption.flatten,
           testDependencies = testDepsResult.toOption.flatten,
+          providedDependencies = providedDepsResult.toOption.flatten,
           homepage = getString(config, "homepage"),
           licenses = getStringList(config, "licenses"),
           versionScheme = getString(config, "versionScheme"),

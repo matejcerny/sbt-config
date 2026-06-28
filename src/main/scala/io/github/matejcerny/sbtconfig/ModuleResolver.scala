@@ -51,6 +51,7 @@ object ModuleResolver {
       scalacOptions = append(shared.scalacOptions, module.scalacOptions),
       dependencies = append(shared.dependencies, module.dependencies),
       testDependencies = append(shared.testDependencies, module.testDependencies),
+      providedDependencies = append(shared.providedDependencies, module.providedDependencies),
       homepage = module.homepage.orElse(shared.homepage),
       licenses = append(shared.licenses, module.licenses),
       versionScheme = module.versionScheme.orElse(shared.versionScheme),

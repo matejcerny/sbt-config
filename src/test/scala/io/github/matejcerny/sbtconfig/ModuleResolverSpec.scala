@@ -72,6 +72,7 @@ class ModuleResolverSpec extends AnyFlatSpec with Matchers {
       scalacOptions = Some(Seq("-deprecation")),
       dependencies = Some(Seq(Dependency("org.typelevel", "cats-core", "2.13.0"))),
       testDependencies = Some(Seq(Dependency("org.scalatest", "scalatest", "3.2.19"))),
+      providedDependencies = Some(Seq(Dependency("com.typesafe", "config", "1.4.9"))),
       licenses = Some(Seq("MIT")),
       developers = Some(Seq(Developer("a", "A", "a@example.com", "https://a.example"))),
       resolvers = Some(Seq(Resolver("shared", "https://shared.example/repo")))
@@ -80,6 +81,7 @@ class ModuleResolverSpec extends AnyFlatSpec with Matchers {
       scalacOptions = Some(Seq("-feature")),
       dependencies = Some(Seq(Dependency("org.tpolecat", "skunk-core", "0.6.4"))),
       testDependencies = Some(Seq(Dependency("org.scalameta", "munit", "1.0.0"))),
+      providedDependencies = Some(Seq(Dependency("org.slf4j", "slf4j-api", "2.0.16"))),
       licenses = Some(Seq("Apache-2.0")),
       developers = Some(Seq(Developer("b", "B", "b@example.com", "https://b.example"))),
       resolvers = Some(Seq(Resolver("module", "https://module.example/repo")))
@@ -98,6 +100,12 @@ class ModuleResolverSpec extends AnyFlatSpec with Matchers {
       Seq(
         Dependency("org.scalatest", "scalatest", "3.2.19"),
         Dependency("org.scalameta", "munit", "1.0.0")
+      )
+    )
+    merged.providedDependencies shouldBe Some(
+      Seq(
+        Dependency("com.typesafe", "config", "1.4.9"),
+        Dependency("org.slf4j", "slf4j-api", "2.0.16")
       )
     )
     merged.licenses shouldBe Some(Seq("MIT", "Apache-2.0"))

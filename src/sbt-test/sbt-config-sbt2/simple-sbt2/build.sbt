@@ -41,6 +41,15 @@ checkDependencies := {
   assert(gsonDep.crossVersion == sbt.librarymanagement.Disabled(), s"Expected gson to use Disabled cross-version, got ${gsonDep.crossVersion}")
 }
 
+val checkProvidedDependencies = taskKey[Unit]("Check provided dependencies")
+checkProvidedDependencies := {
+  val deps = libraryDependencies.value
+  val configDep = deps.find(_.name == "config")
+  assert(configDep.isDefined, s"Expected config dependency in ${deps.map(_.name)}")
+  assert(configDep.get.configurations == Some("provided"), s"Expected config to have provided scope, got ${configDep.get.configurations}")
+  assert(configDep.get.crossVersion == sbt.librarymanagement.Disabled(), s"Expected config to use Disabled cross-version, got ${configDep.get.crossVersion}")
+}
+
 // Publishing settings assertions
 val checkHomepage = taskKey[Unit]("Check homepage")
 checkHomepage := {

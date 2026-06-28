@@ -98,3 +98,30 @@ testDependencies {
   java  = ["junit:junit:4.13.2"]
 }
 ```
+
+## Provided Dependencies
+
+Provided dependencies are on the compile classpath but are **not** packaged or published — use them for libraries supplied by the runtime environment. They automatically get the `Provided` scope:
+
+```hocon
+providedDependencies = [
+  "com.typesafe:config:1.4.9"
+]
+```
+
+This is equivalent to:
+
+```scala
+libraryDependencies ++= Seq(
+  "com.typesafe" % "config" % "1.4.9" % Provided
+)
+```
+
+Provided dependencies also support the nested object format:
+
+```hocon
+providedDependencies {
+  scala = ["org.typelevel:cats-core:2.13.0"]
+  java  = ["com.typesafe:config:1.4.9"]
+}
+```

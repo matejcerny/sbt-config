@@ -25,6 +25,7 @@ addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
 // build.sbt
 lazy val root = crossProject(JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
+  .in(file("."))
 ```
 
 By default, the plugin reads `build.conf` from the build root, so every platform sub-project picks it up automatically. Override `sbtConfigFile` only if your `build.conf` lives elsewhere.

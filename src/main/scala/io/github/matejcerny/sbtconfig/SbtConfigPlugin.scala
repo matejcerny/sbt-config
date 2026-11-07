@@ -199,7 +199,7 @@ object SbtConfigPlugin extends AutoPlugin {
          |
          |# Provided dependencies (compile-time only, not packaged/published)
          |# providedDependencies = [
-         |#   "com.typesafe:config:1.4.9"
+         |#   "com.typesafe:config:1.4.10"
          |# ]
          |
          |# Resolvers (additional Maven repositories)

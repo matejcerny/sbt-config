@@ -27,7 +27,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
         |  "org.scalatest:scalatest:3.2.19"
         |]
         |providedDependencies = [
-        |  "com.typesafe:config:1.4.9"
+        |  "com.typesafe:config:1.4.10"
         |]
         |""".stripMargin
 
@@ -63,7 +63,7 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
       """
         |providedDependencies {
         |  scala = ["org.typelevel:cats-core:2.13.0"]
-        |  java  = ["com.typesafe:config:1.4.9"]
+        |  java  = ["com.typesafe:config:1.4.10"]
         |}
         |""".stripMargin
 

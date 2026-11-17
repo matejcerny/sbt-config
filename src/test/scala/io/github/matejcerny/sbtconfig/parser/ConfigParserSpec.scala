@@ -7,6 +7,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.io.File
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
@@ -219,12 +220,12 @@ class ConfigParserSpec extends AnyFlatSpec with Matchers with EitherValues {
   "ConfigParser.parse(File)" should "parse a valid config file" in {
     val tempFile = Files.createTempFile("test-config", ".conf").toFile
     tempFile.deleteOnExit()
-    Files.writeString(
+    Files.write(
       tempFile.toPath,
       s"""
         |name = "${Example.name}"
         |scalaVersion = "${Example.scalaVersion}"
-        |""".stripMargin
+        |""".stripMargin.getBytes(StandardCharsets.UTF_8)
     )
 
     val result = ConfigParser.parse(tempFile)

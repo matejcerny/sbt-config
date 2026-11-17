@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 env:
-  SCALA_VERSION: 3.8.4
+  SCALA_VERSION: 3.9.0
 
 jobs:
   deploy:

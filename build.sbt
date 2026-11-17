@@ -1,6 +1,6 @@
 ThisBuild / organization := "io.github.matejcerny"
 ThisBuild / scalaVersion := "2.12.21"
-ThisBuild / crossScalaVersions := Seq("2.12.21", "3.8.4")
+ThisBuild / crossScalaVersions := Seq("2.12.21", "3.9.0")
 
 ThisBuild / homepage := Some(url("https://github.com/matejcerny/sbt-config"))
 ThisBuild / licenses := List("MIT" -> url("https://opensource.org/licenses/MIT"))
@@ -23,7 +23,7 @@ lazy val root = project
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.12.12"
-        case _      => "2.0.0"
+        case _      => "2.1.0"
       }
     },
     libraryDependencies ++= Seq(
@@ -43,7 +43,7 @@ lazy val root = project
     ),
     scalacOptions ++= {
       if (scalaBinaryVersion.value == "2.12")
-        Seq("-Xfatal-warnings", "-Xlint", "-Ywarn-dead-code", "-Ywarn-numeric-widen", "-Ywarn-value-discard")
+        Seq("-Xsource:3", "-release:8", "-Xfatal-warnings", "-Xlint", "-Ywarn-dead-code", "-Ywarn-numeric-widen", "-Ywarn-value-discard")
       else Seq("-Werror", "-Wconf:msg=deprecated for wildcard arguments:s")
     },
     coverageExcludedFiles := ".*SbtConfigPlugin.*",

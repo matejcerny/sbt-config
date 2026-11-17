@@ -33,11 +33,11 @@ object SbtConfigPlugin extends AutoPlugin {
   private val sbtConfigSkipAggregatorPublish =
     settingKey[Boolean]("Whether this project is the auto root aggregator and should not be published")
 
-  override def globalSettings: Seq[Setting[_]] = Seq(
+  override def globalSettings: Seq[Setting[?]] = Seq(
     platformDepsCrossVersion := CrossVersion.binary
   )
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     sbtConfigFile := (LocalRootProject / baseDirectory).value / "build.conf",
     sbtConfigModule := None,
     sbtConfigPlatform := detectPlatform(platformDepsCrossVersion.value),
@@ -48,7 +48,7 @@ object SbtConfigPlugin extends AutoPlugin {
     publish / skip := sbtConfigSkipAggregatorPublish.value
   ) ++ configSettings
 
-  private def configSettings: Seq[Setting[_]] = Seq(
+  private def configSettings: Seq[Setting[?]] = Seq(
     name := configValue(_.name).value.getOrElse(name.value),
     moduleName := configValue(_.name).value.getOrElse(name.value),
     organization := configValue(_.organization).value.getOrElse(organization.value),
@@ -73,7 +73,7 @@ object SbtConfigPlugin extends AutoPlugin {
       val platformCV = platformDepsCrossVersion.value
       filterDeps(deps, platform).map(toModuleId(_, platformCV) % Provided)
     },
-    homepage := configValue(_.homepage).value.map(url) orElse homepage.value,
+    homepage := configValue(_.homepage).value.map(compat.projectUrl) orElse homepage.value,
     licenses ++= configValue(_.licenses).value
       .getOrElse(Seq.empty)
       .flatMap(License.toLicense),
@@ -262,6 +262,6 @@ object SbtConfigPlugin extends AutoPlugin {
       id = dev.id,
       name = dev.name,
       email = dev.email,
-      url = url(dev.url)
+      url = compat.projectUrl(dev.url)
     )
 }
